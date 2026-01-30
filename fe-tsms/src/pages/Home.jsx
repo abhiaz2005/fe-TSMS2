@@ -1,0 +1,52 @@
+import React from "react";
+import Layout from "../components/layout/Layout";
+import Banner from "../images/study.png";
+import { Box, Typography, Button } from "@mui/material";
+import { Link } from "react-router-dom";
+
+const Home = () => {
+  return (
+    <Layout>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          backgroundImage: `url(${Banner})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            ml: { xs: 2, md: 8 },
+            bgcolor: "rgba(0,0,0,0.6)",
+            p: 4,
+            borderRadius: 2,
+            color: "white",
+          }}
+        >
+          <Typography variant="h3" fontWeight="bold">
+            Food Website
+          </Typography>
+
+          <Typography variant="h6" sx={{ my: 2 }}>
+            Newly explored coaching
+          </Typography>
+
+          <Button
+            component={Link}
+            to="/classes"
+            variant="contained"
+            color="warning"
+            size="large"
+          >
+            Visit classes
+          </Button>
+        </Box>
+      </Box>
+    </Layout>
+  );
+};
+
+export default Home;

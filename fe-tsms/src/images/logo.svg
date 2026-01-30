@@ -1,0 +1,38 @@
+<svg width="860" height="180" viewBox="0 0 860 180" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Outer circle -->
+  <circle cx="120" cy="90" r="70" stroke="#1e3a8a" stroke-width="6" fill="none"/>
+
+  <!-- Laurel leaves -->
+  <path d="M120 22 C75 28, 55 65, 55 90 C55 115, 75 152, 120 158"
+        stroke="#1e3a8a" stroke-width="5" fill="none"/>
+  <path d="M120 22 C165 28, 185 65, 185 90 C185 115, 165 152, 120 158"
+        stroke="#1e3a8a" stroke-width="5" fill="none"/>
+
+  <!-- Sun -->
+  <circle cx="120" cy="70" r="18" fill="#f97316"/>
+  <line x1="120" y1="40" x2="120" y2="30" stroke="#f97316" stroke-width="3"/>
+  <line x1="95" y1="45" x2="85" y2="35" stroke="#f97316" stroke-width="3"/>
+  <line x1="145" y1="45" x2="155" y2="35" stroke="#f97316" stroke-width="3"/>
+
+  <!-- Book -->
+  <path d="M90 78 Q120 68 150 78 V110 Q120 100 90 110 Z"
+        fill="#0ea5e9"/>
+  <line x1="120" y1="78" x2="120" y2="110"
+        stroke="white" stroke-width="2"/>
+
+  <!-- Pen nib -->
+  <polygon points="120,95 114,112 120,118 126,112"
+           fill="white"/>
+
+  <!-- Cursive Text -->
+  <text x="240" y="112"
+        font-family="'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive"
+        font-size="62"
+        font-weight="bold"
+        fill="white"
+        letter-spacing="1">
+    Genius Guidelines
+  </text>
+
+</svg>
