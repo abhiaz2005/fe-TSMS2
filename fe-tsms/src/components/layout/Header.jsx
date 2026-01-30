@@ -82,16 +82,7 @@ const Header = () => {
             }}
           />
         </ListItemButton>
-        <ListItemButton component={NavLink} to="/contact">
-          <ListItemText
-            primary="Contact"
-            sx={{
-              "& .MuiListItemText-primary": {
-                fontWeight: "bold",
-              },
-            }}
-          />
-        </ListItemButton>
+        
         <ListItemButton onClick={() => setStudentOpen(!studentOpen)}>
           <ListItemText
             primary="Student"
@@ -136,7 +127,7 @@ const Header = () => {
                 }}
               />
             </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/contact">
+            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/about">
               <ListItemText
                 primary="Fees"
                 sx={{
@@ -204,9 +195,7 @@ const Header = () => {
                 <ListItemButton component={NavLink} to="/about">
                   <ListItemText primary="About" />
                 </ListItemButton>
-                <ListItemButton component={NavLink} to="/contact">
-                  <ListItemText primary="Contact" />
-                </ListItemButton>
+                
                 <ListItemButton onClick={() => setStudentOpen(!studentOpen)}>
                   <ListItemText primary="Student" />
                   {studentOpen ? <ExpandLess /> : <ExpandMore />}
@@ -241,7 +230,7 @@ const Header = () => {
                     <ListItemButton
                       sx={{ pl: 4 }}
                       component={NavLink}
-                      to="/contact"
+                      to="/about"
                     >
                       <ListItemText primary="fees" />
                     </ListItemButton>

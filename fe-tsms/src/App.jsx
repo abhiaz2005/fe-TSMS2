@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import About from './pages/About'
-import Contact from './pages/Contact'
 import PageNotFound from './pages/PageNotFound'
 import Students from './pages/Students'
 
@@ -17,7 +16,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/students" element={<Students />} />
           <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>

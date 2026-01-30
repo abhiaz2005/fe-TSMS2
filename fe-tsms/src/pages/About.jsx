@@ -1,6 +1,15 @@
 import React from "react";
 import Layout from "../components/layout/Layout";
-import { Box, Typography } from "@mui/material";
+import { TeacherList } from "../data/teacher.js";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Typography,
+} from "@mui/material";
 
 const About = () => {
   return (
@@ -8,8 +17,8 @@ const About = () => {
       <Layout>
         <Box
           sx={{
-            my: 15,
-            mx: 10,
+            my: 10,
+            mx: 5,
             textAlign: "center",
             p: 2,
             "& h4": {
@@ -17,27 +26,28 @@ const About = () => {
               my: 2,
               fontSize: "2rem",
               color: "#E5E7EB",
-
             },
             "& p": {
               textAlign: "justify",
-              color: "#E5E7EB",
-
+              color: "#9a9ea7",
             },
             "@media (max-width:600px)": {
-              mt: 10,
+              mt: 8,
               "& h4": {
                 fontSize: "1.5rem",
               },
             },
-            
           }}
         >
           <Typography variant="h4" fontWeight="bold" gutterBottom>
             Genius Guidelines
           </Typography>
 
-          <Typography variant="body1" sx={{ textAlign: "justify" }} gutterBottom>
+          <Typography
+            variant="body1"
+            sx={{ textAlign: "justify" }}
+            gutterBottom
+          >
             Genius Guidelines is a growing and trusted coaching institute
             located at
             <strong> 42 Mouza, Near Yasoda Garden</strong>. The institute is
@@ -50,7 +60,11 @@ const About = () => {
 
           <br />
 
-          <Typography variant="body1" sx={{ textAlign: "justify" }} gutterBottom>
+          <Typography
+            variant="body1"
+            sx={{ textAlign: "justify" }}
+            gutterBottom
+          >
             With experienced faculty members and the best learning facilities,
             Genius Guidelines helps students build strong conceptual clarity and
             confidence. Our students have consistently shown better academic
@@ -59,6 +73,63 @@ const About = () => {
             committed to nurturing young minds and supporting students in
             achieving their academic goals.
           </Typography>
+          <Typography variant="h4" sx={{ mt: 3 }} gutterBottom>
+            Teachers
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 3,
+            }}
+          >
+            {TeacherList.map((teacher, index) => (
+              <Card
+                sx={{ minWidth: 300, maxWidth: 330, bgcolor: "#2F313A" }}
+                key={index}
+              >
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="240"
+                    image={teacher.image}
+                    alt="teacher1"
+                  />
+                  <CardContent
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                      color="#bec1cb"
+                    >
+                      {teacher.name}
+                    </Typography>
+                    <Typography variant="body1">
+                      <b>Education:</b> &nbsp; {teacher.education}
+                    </Typography>
+                    <Typography variant="body1">
+                      <b>Experience:</b> &nbsp; {teacher.experience}
+                    </Typography>
+                    <Typography variant="body1">
+                      <b>Position:</b> &nbsp; {teacher.position}
+                    </Typography>
+                    
+                      <Typography variant="body1">
+                        <b>Phone Number:</b> &nbsp; {teacher.phoneno?teacher.phoneno:"_"}
+                      </Typography>
+                    
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))}
+          </Box>
         </Box>
       </Layout>
     </>

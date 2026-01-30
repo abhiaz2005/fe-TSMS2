@@ -19,7 +19,7 @@ const Home = () => {
       >
         <Box
           sx={{
-            ml: { xs: 2, md: 8 },
+            mx: { xs: 2, md: 8 },
             bgcolor: "rgba(0,0,0,0.6)",
             p: 4,
             borderRadius: 2,
@@ -27,7 +27,7 @@ const Home = () => {
           }}
         >
           <Typography variant="h3" fontWeight="bold">
-            Food Website
+            Genius Guidelines
           </Typography>
 
           <Typography variant="h6" sx={{ my: 2 }}>
