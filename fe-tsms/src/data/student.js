@@ -1,63 +1,170 @@
-export const StudentList =
-    [
-        {
-            "id": 101,
-            "name": "Rahul Sharma",
-            "profile_picture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-            "class": "10th",
-            "section": "A",
-            "roll_no": 12,
-            "gender": "Male",
-            "age": 15,
-            "email": "rahul.sharma@student.com",
-            "phone": "9876543210",
-            "address": "Delhi, India",
-            "studied_from": "2023-04-01",
-            "status": "ACTIVE"
-        },
-        {
-            "id": 102,
-            "name": "Priya Verma",
-            "profile_picture": "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-            "class": "9th",
-            "section": "B",
-            "roll_no": 8,
-            "gender": "Female",
-            "age": 14,
-            "email": "priya.verma@student.com",
-            "phone": "9123456780",
-            "address": "Lucknow, India",
-            "studied_from": "2022-06-15",
-            "status": "ACTIVE"
-        },
-        {
-            "id": 103,
-            "name": "Aman Singh",
-            "profile_picture": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
-            "class": "8th",
-            "section": "A",
-            "roll_no": 20,
-            "gender": "Male",
-            "age": 13,
-            "email": "aman.singh@student.com",
-            "phone": "9988776655",
-            "address": "Patna, India",
-            "studied_from": "2024-01-10",
-            "status": "ACTIVE"
-        },
-        {
-            "id": 104,
-            "name": "Neha Patel",
-            "profile_picture": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-            "class": "12th",
-            "section": "C",
-            "roll_no": 3,
-            "gender": "Female",
-            "age": 17,
-            "email": "neha.patel@student.com",
-            "phone": "9090909090",
-            "address": "Ahmedabad, India",
-            "studied_from": "2021-07-01",
-            "status": "INACTIVE"
-        }
-    ];
+export const StudentList = [
+  {
+    id: 101,
+    name: "Rahul Sharma",
+    profile_picture:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    class: "10th",
+    section: "A",
+    roll_no: 12,
+    gender: "Male",
+    age: 15,
+    email: "rahul.sharma@student.com",
+    phone: "9876543210",
+    address: "Delhi, India",
+    studied_from: "2023-04-01",
+    status: "ACTIVE",
+  },
+  {
+    id: 102,
+    name: "Priya Verma",
+    profile_picture:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    class: "9th",
+    section: "B",
+    roll_no: 8,
+    gender: "Female",
+    age: 14,
+    email: "priya.verma@student.com",
+    phone: "9123456780",
+    address: "Lucknow, India",
+    studied_from: "2022-06-15",
+    status: "ACTIVE",
+  },
+  {
+    id: 103,
+    name: "Aman Singh",
+    profile_picture:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+    class: "8th",
+    section: "A",
+    roll_no: 20,
+    gender: "Male",
+    age: 13,
+    email: "aman.singh@student.com",
+    phone: "9988776655",
+    address: "Patna, India",
+    studied_from: "2024-01-10",
+    status: "ACTIVE",
+  },
+  {
+    id: 104,
+    name: "Neha Patel",
+    profile_picture:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+    class: "12th",
+    section: "C",
+    roll_no: 3,
+    gender: "Female",
+    age: 17,
+    email: "neha.patel@student.com",
+    phone: "9090909090",
+    address: "Ahmedabad, India",
+    studied_from: "2021-07-01",
+    status: "INACTIVE",
+  },
+];
+
+export const studentMarks = [
+  {
+    name: "John Doe",
+    class: "10th",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+    exams: [
+      { examName: "PT1", securedMark: 82, fullMark: 100 },
+      { examName: "PT2", securedMark: 81, fullMark: 100 },
+      { examName: "PT3", securedMark: 83, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Sona Dey",
+    class: "8th",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+    exams: [
+      { examName: "PT1", securedMark: 82, fullMark: 100 },
+      { examName: "PT2", securedMark: 42, fullMark: 100 },
+      { examName: "PT3", securedMark: 83, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Aman Verma",
+    class: "9th",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    exams: [
+      { examName: "PT1", securedMark: 76, fullMark: 100 },
+      { examName: "PT2", securedMark: 79, fullMark: 100 },
+      { examName: "PT3", securedMark: 81, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Riya Sharma",
+    class: "10th",
+    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+    exams: [
+      { examName: "PT1", securedMark: 88, fullMark: 100 },
+      { examName: "PT2", securedMark: 91, fullMark: 100 },
+      { examName: "PT3", securedMark: 89, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Mohit Kumar",
+    class: "7th",
+    image: "https://images.unsplash.com/photo-1527980965255-d3b416303d12",
+    exams: [
+      { examName: "PT1", securedMark: 65, fullMark: 100 },
+      { examName: "PT2", securedMark: 70, fullMark: 100 },
+      { examName: "PT3", securedMark: 72, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Neha Singh",
+    class: "9th",
+    image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
+    exams: [
+      { examName: "PT1", securedMark: 90, fullMark: 100 },
+      { examName: "PT2", securedMark: 87, fullMark: 100 },
+      { examName: "PT3", securedMark: 92, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Rahul Das",
+    class: "8th",
+    image: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c",
+    exams: [
+      { examName: "PT1", securedMark: 58, fullMark: 100 },
+      { examName: "PT2", securedMark: 63, fullMark: 100 },
+      { examName: "PT3", securedMark: 60, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Pooja Patel",
+    class: "10th",
+    image: "https://images.unsplash.com/photo-1548142813-c348350df52b",
+    exams: [
+      { examName: "PT1", securedMark: 84, fullMark: 100 },
+      { examName: "PT2", securedMark: 86, fullMark: 100 },
+      { examName: "PT3", securedMark: 88, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Arjun Mehta",
+    class: "9th",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+    exams: [
+      { examName: "PT1", securedMark: 73, fullMark: 100 },
+      { examName: "PT2", securedMark: 75, fullMark: 100 },
+      { examName: "PT3", securedMark: 78, fullMark: 100 },
+    ],
+  },
+  {
+    name: "Sneha Roy",
+    class: "7th",
+    image: "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7",
+    exams: [
+      { examName: "PT1", securedMark: 95, fullMark: 100 },
+      { examName: "PT2", securedMark: 93, fullMark: 100 },
+      { examName: "PT3", securedMark: 96, fullMark: 100 },
+    ],
+  },
+];
+
