@@ -40,7 +40,12 @@ const Students = () => {
                                     <Avatar
                                         src={`${student.profile_picture}?w=80&h=80&fit=crop`}
                                         alt={student.name}
-                                        imgProps={{loading:'lazy'}}
+                                        slotProps={{
+                                            img:{
+                                                loading:'lazy',
+                                                referrerPolicy:'no-referrer'
+                                            }
+                                        }}
                                     />
                                 </ListItemAvatar>
 
