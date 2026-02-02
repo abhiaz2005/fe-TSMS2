@@ -127,7 +127,7 @@ const Header = () => {
                 }}
               />
             </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/about">
+            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/student/fees">
               <ListItemText
                 primary="Fees"
                 sx={{
@@ -230,7 +230,7 @@ const Header = () => {
                     <ListItemButton
                       sx={{ pl: 4 }}
                       component={NavLink}
-                      to="/about"
+                      to="/student/fees"
                     >
                       <ListItemText primary="fees" />
                     </ListItemButton>

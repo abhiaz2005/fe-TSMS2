@@ -168,3 +168,110 @@ export const studentMarks = [
   },
 ];
 
+export const studentFees = [
+  {
+    studentId: 1,
+    studentName: "Rahul Kumar",
+    class: "10th",
+    img: "https://i.pravatar.cc/150?img=12",
+    fees: [
+      {
+        month: "January",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-01-05",
+        mode: "UPI",
+      },
+      {
+        month: "February",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-02-05",
+        mode: "CASH",
+      },
+      {
+        month: "March",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-03-06",
+        mode: "UPI",
+      },
+    ],
+  },
+
+  {
+    studentId: 2,
+    studentName: "Ayesha Khan",
+    class: "9th",
+    img: "https://i.pravatar.cc/150?img=47",
+    fees: [
+      {
+        month: "January",
+        year: 2026,
+        amount: 900,
+        paymentDate: "2026-01-07",
+        mode: "BANK",
+      },
+      {
+        month: "February",
+        year: 2026,
+        amount: 900,
+        paymentDate: "2026-02-08",
+        mode: "UPI",
+      },
+    ],
+  },
+
+  {
+    studentId: 3,
+    studentName: "Rohit Singh",
+    class: "8th",
+    img: "https://i.pravatar.cc/150?img=32",
+    fees: [
+      {
+        month: "January",
+        year: 2026,
+        amount: 800,
+        paymentDate: "2026-01-10",
+        mode: "CASH",
+      },
+    ],
+  },
+
+  {
+    studentId: 4,
+    studentName: "Neha Verma",
+    class: "10th",
+    img: "https://i.pravatar.cc/150?img=21",
+    fees: [
+      {
+        month: "January",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-01-04",
+        mode: "UPI",
+      },
+      {
+        month: "February",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-02-04",
+        mode: "UPI",
+      },
+      {
+        month: "March",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-03-04",
+        mode: "UPI",
+      },
+      {
+        month: "April",
+        year: 2026,
+        amount: 1000,
+        paymentDate: "2026-04-04",
+        mode: "BANK",
+      },
+    ],
+  },
+];

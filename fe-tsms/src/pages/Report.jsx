@@ -334,12 +334,7 @@ const Report = () => {
             fullWidth
             margin="dense"
             value={examEvent.fullMark}
-            onChange={(e) =>
-              setExamEvent({
-                ...examEvent,
-                fullMark: e.target.value,
-              })
-            }
+            disabled
           />
         </DialogContent>
 
