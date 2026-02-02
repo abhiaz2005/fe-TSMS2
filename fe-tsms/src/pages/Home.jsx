@@ -36,12 +36,12 @@ const Home = () => {
 
           <Button
             component={Link}
-            to="/classes"
+            to="/courses"
             variant="contained"
             color="warning"
             size="large"
           >
-            Visit classes
+            Visit courses
           </Button>
         </Box>
       </Box>
