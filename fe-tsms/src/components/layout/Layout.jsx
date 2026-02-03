@@ -2,8 +2,9 @@ import { Box } from "@mui/material";
 import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
+import { Outlet } from "react-router-dom";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <Box
       style={{
@@ -15,7 +16,9 @@ const Layout = ({ children }) => {
       <Header />
 
       {/* Page content */}
-      <div style={{ flex: 1 ,backgroundColor:'#2F313A'}}>{children}</div>
+      <div style={{ flex: 1 ,backgroundColor:'#2F313A'}}>
+        <Outlet />
+      </div>
 
       <Footer />
     </Box>

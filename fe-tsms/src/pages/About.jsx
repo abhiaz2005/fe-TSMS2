@@ -14,7 +14,7 @@ import {
 const About = () => {
   return (
     <>
-      <Layout>
+      <Box>
         <Box
           sx={{
             my: 10,
@@ -131,7 +131,7 @@ const About = () => {
             ))}
           </Box>
         </Box>
-      </Layout>
+      </Box>
     </>
   );
 };

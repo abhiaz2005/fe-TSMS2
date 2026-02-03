@@ -144,7 +144,7 @@ const Report = () => {
   };
 
   return (
-    <Layout>
+    <Box>
       <Box
         sx={{
           my: 10,
@@ -507,7 +507,7 @@ const Report = () => {
           {snack.message}
         </Alert>
       </Snackbar>
-    </Layout>
+    </Box>
   );
 };
 

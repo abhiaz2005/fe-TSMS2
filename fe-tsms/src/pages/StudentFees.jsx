@@ -118,7 +118,7 @@ const StudentFees = () => {
   };
 
   return (
-    <Layout>
+    <Box>
       <Box sx={{ my: 10, p: 2, color: "white" }}>
         {/* PAGE TITLE */}
         <div className="addButton">
@@ -403,7 +403,7 @@ const StudentFees = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Layout>
+    </Box>
   );
 };
 

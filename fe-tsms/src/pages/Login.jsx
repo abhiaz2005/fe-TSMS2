@@ -1,12 +1,13 @@
 import React from 'react'
 import Layout from '../components/layout/Layout'
+import { Box } from '@mui/material'
 
 
 const Login = () => {
   return (
-    <Layout>
-                <h1>Login</h1>
-            </Layout>
+    <Box>
+      <h1>Login</h1>
+    </Box>
   )
 }
 

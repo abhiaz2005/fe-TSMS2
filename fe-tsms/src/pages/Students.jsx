@@ -10,7 +10,7 @@ const Students = () => {
     const [open, setOpen] = useState(false);
 
     return (
-        <Layout>
+        <Box>
             <Box
                 sx={{
                     my: 15,
@@ -145,7 +145,7 @@ const Students = () => {
 
                 </List>
             </Box>
-        </Layout>
+        </Box>
     )
 }
 
