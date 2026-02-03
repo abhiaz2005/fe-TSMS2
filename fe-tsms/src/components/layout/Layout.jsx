@@ -15,10 +15,18 @@ const Layout = () => {
     >
       <Header />
 
-      {/* Page content */}
-      <div style={{ flex: 1 ,backgroundColor:'#2F313A'}}>
+     
+      {/* MAIN CONTENT */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          width: "100%",
+          backgroundColor:'#2F313A'
+        }}
+      >
         <Outlet />
-      </div>
+      </Box>
 
       <Footer />
     </Box>

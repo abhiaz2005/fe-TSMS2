@@ -14,106 +14,104 @@ import {
   Chip,
 } from "@mui/material";
 
-const StudentFeesDetail = ({student}) => {
- 
-
- 
-
+const StudentFeesDetail = ({ student }) => {
   if (!student) {
     return <Typography color="white">Student not found 😕</Typography>;
   }
 
   return (
-    <Box sx={{ p: 2, color: "white" }}>
-      <Grid container spacing={2}>
-        {/* LEFT SIDE – STUDENT INFO */}
-        <Grid  item xs={12} md={4}>
-          <Paper
-            sx={{
-              bgcolor: "#404147",
-              p: 3,
-              borderRadius: 2,
-              textAlign: "center"
-            }}
-          >
-            <Avatar
-              src={student.img}
-              sx={{ width: 120, height: 120, mx: "auto", mb: 2 }}
-            />
-            <Typography variant="h6">{student.studentName}</Typography>
-            <Typography color="gray">
-              Class {student.class}
-            </Typography>
+    <Box
+      sx={{
+        p: 2,
+        color: "white",
+        width: "100%",
+        gap: 2,
+        display: "flex",
+        flexWrap: {
+          md: "nowrap",
+          xs: "wrap",
+        },
+      }}
+    >
+      {/* left side */}
+      <Box
+        sx={{
+          width: { xs: "100%", md: "30%" },
+          bgcolor: "#404147",
+          p: 3,
+          borderRadius: 2,
+          // textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          alignItems: "center",
+        }}
+      >
+        <Avatar sx={{ width: 150, height: 150 }} src={student.img} />
+        <Typography variant="h4">{student.studentName}</Typography>
+        <Typography variant="h6" color="gray">
+          {" "}
+          Class {student.class}{" "}
+        </Typography>
+        <Box sx={{ mt: 2 }}>
+          <Chip
+            label={`Total Payments: ${student.fees.length}`}
+            color="primary"
+          />
+        </Box>
+      </Box>
 
-            <Box sx={{ mt: 2 }}>
-              <Chip
-                label={`Total Payments: ${student.fees.length}`}
-                color="primary"
-              />
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* RIGHT SIDE – PAYMENTS */}
-        <Grid item xs={12} md={8}>
-          <Paper
-            sx={{
-              bgcolor: "#404147",
-              p: 2,
-              borderRadius: 2,
-            }}
-          >
-            <Typography color="white" variant="h6" sx={{ mb: 2 }}>
-              💰 Fee Payments
-            </Typography>
-
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ color: "white" }}>Month</TableCell>
-                    <TableCell sx={{ color: "white" }}>Year</TableCell>
-                    <TableCell sx={{ color: "white" }}>Amount</TableCell>
-                    <TableCell sx={{ color: "white" }}>Mode</TableCell>
-                    <TableCell sx={{ color: "white" }}>Date</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {student.fees.map((fee, index) => (
-                    <TableRow key={index}>
-                      <TableCell sx={{ color: "gray" }}>
-                        {fee.month}
-                      </TableCell>
-                      <TableCell sx={{ color: "gray" }}>
-                        {fee.year}
-                      </TableCell>
-                      <TableCell sx={{ color: "gray" }}>
-                        ₹ {fee.amount}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="small"
-                          label={fee.mode}
-                          color={
-                            fee.mode === "CASH"
-                              ? "warning"
-                              : fee.mode === "UPI"
-                              ? "success"
-                              : "info"
-                          }
-                        />
-                      </TableCell>
-                      <TableCell sx={{ color: "gray" }}>
-                        {fee.paymentDate}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-      </Grid>
+      {/* Right side */}
+      <Box
+        sx={{
+          bgcolor: "#404147",
+          width: { xs: "100%", md: "70%" },
+          p: 2,
+          borderRadius: 2,
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          💰 Fee Payments
+        </Typography>
+        <TableContainer>
+          <Table size="medium">
+            <TableHead
+              sx={{
+                "& th": {
+                  color: "white",
+                  fontWeight: 600,
+                },
+              }}
+            >
+              <TableRow>
+                <TableCell>Month</TableCell>
+                <TableCell>Year</TableCell>
+                <TableCell>Payment</TableCell>
+                <TableCell>Mode</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody
+              sx={{
+                "& td": {
+                  color: "#bbb6b6",
+                  fontWeight: 600,
+                },
+              }}
+            >
+              {student.fees.map((s, i) => (
+                <TableRow key={i}>
+                  <TableCell>{s.month}</TableCell>
+                  <TableCell>{s.year}</TableCell>
+                  <TableCell>{s.amount}</TableCell>
+                  <TableCell>
+                    <Chip label={s.mode} color={s.mode==='CASH'?'warning':s.mode=='UPi' ?'success':'info'} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 };
