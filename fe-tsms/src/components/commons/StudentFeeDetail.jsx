@@ -2,8 +2,6 @@ import React from "react";
 import {
   Avatar,
   Box,
-  Grid,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -37,6 +35,7 @@ const StudentFeesDetail = ({ student }) => {
       <Box
         sx={{
           width: { xs: "100%", md: "30%" },
+          height: { xs: "100%", md: "30%" },
           bgcolor: "#404147",
           p: 3,
           borderRadius: 2,
