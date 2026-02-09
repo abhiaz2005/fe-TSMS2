@@ -34,7 +34,7 @@ export const router = createBrowserRouter(
           <Route path="student/fees" element={<StudentFees />} />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN", "USER"]} />}>
           <Route path="student/fees/:id" element={<StudentFees />} />
         </Route>
         {/* 404 */}
