@@ -30,12 +30,12 @@ export const router = createBrowserRouter(
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route path="report" element={<Report />} />
           <Route path="students" element={<Students />} />
-
           <Route path="student/fees" element={<StudentFees />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["ADMIN", "USER"]} />}>
           <Route path="student/fees/:id" element={<StudentFees />} />
+          <Route path="students/:id" element={<Students />} />
         </Route>
         {/* 404 */}
         <Route path="*" element={<PageNotFound />} />

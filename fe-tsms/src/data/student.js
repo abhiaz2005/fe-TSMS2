@@ -5,7 +5,7 @@ export const StudentList = [
     profile_picture:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
     class: "10th",
-    section: "A",
+    
     roll_no: 12,
     gender: "Male",
     age: 15,

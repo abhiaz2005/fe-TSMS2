@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   AppBar,
   Box,
@@ -10,257 +11,234 @@ import {
   Collapse,
   Drawer,
   Avatar,
+  Divider,
 } from "@mui/material";
-import React, { useState } from "react";
+
 import MenuIcon from "@mui/icons-material/Menu";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import Logo from "../../images/logo.svg";
-import { NavLink } from "react-router-dom";
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import LogoutIcon from "@mui/icons-material/Logout";
+import LoginIcon from "@mui/icons-material/Login";
+import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
+
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/authcontext/AuthContext";
+import { menuConfig } from "../../config/menuConfig";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [studentOpen, setStudentOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const { user, role, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const userId = user?.id;
+
+ 
+  const menuItems =
+    typeof menuConfig?.[role] === "function"
+      ? menuConfig[role](userId)
+      : menuConfig?.[role] || [];
+
+  const closeAll = () => {
+    setMobileOpen(false);
+    setDropdownOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    closeAll();
+    navigate("/");
+    toast.success("Logged out successfully ✅");
+  };
+
+  const handleLogin = () => {
+    closeAll();
+    navigate("/login");
+  };
+
+  /* ================= MOBILE DRAWER ================= */
   const mobileDrawer = () => (
-    <Box
-      sx={{
-        textAlign: "center",
-        bgcolor: "#33353d",
-        width: "100%",
-        height: "100%",
-        color: "white",
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mx:1
-      }}>
-        <Avatar sx={{ m: 3 }}>
-          <MenuBookOutlinedIcon sx={{color:'black'}} />
+    <Box sx={{ bgcolor: "#33353d", height: "100%", color: "white", p: 2 }}>
+      {/* LOGO */}
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <Avatar sx={{ mr: 1 }}>
+          <MenuBookOutlinedIcon sx={{ color: "black" }} />
         </Avatar>
-        <Typography
-          color="white"
-          variant="h6"
-          component="div"
-          sx={{
-            flexGrow: 1,
-            fontFamily: "cursive",
-            fontWeight: "bolder",
-            ml: 1
-          }}
-        >
-          Genius Guidelines
-        </Typography>
+        <Typography fontWeight="bold">Genius Guidelines</Typography>
       </Box>
-      <List
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          m: 2,
-        }}
-      >
-        
-         <ListItemButton component={NavLink} to="/">
-          <ListItemText
-            primary="Home"
-            sx={{
-              "& .MuiListItemText-primary": {
-                fontWeight: "bold",
-              },
-            }}
-          />
-        </ListItemButton>
-        <ListItemButton component={NavLink} to="/about">
-          <ListItemText
-            primary="About"
-            sx={{
-              "& .MuiListItemText-primary": {
-                fontWeight: "bold",
-              },
-            }}
-          />
-        </ListItemButton>
-        
-        <ListItemButton onClick={() => setStudentOpen(!studentOpen)}>
-          <ListItemText
-            primary="Student"
-            sx={{
-              "& .MuiListItemText-primary": {
-                fontWeight: "bold",
-              },
-            }}
-          />
-          {studentOpen ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={studentOpen}>
 
-          <List disablePadding>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/students">
-              <ListItemText
-                primary="Students"
-                sx={{
-                  "& .MuiListItemText-primary": {
-                    fontWeight: "bold",
-                  },
-                }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/report">
-              <ListItemText
-                primary="Reports"
-                sx={{
-                  "& .MuiListItemText-primary": {
-                    fontWeight: "bold",
-                  },
-                }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/about">
-              <ListItemText
-                primary="Attendance"
-                sx={{
-                  "& .MuiListItemText-primary": {
-                    fontWeight: "bold",
-                  },
-                }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/student/fees">
-              <ListItemText
-                primary="Fees"
-                sx={{
-                  "& .MuiListItemText-primary": {
-                    fontWeight: "bold",
-                  },
-                }}
-              />
-            </ListItemButton>
-          </List>
-        </Collapse>
+      <Divider sx={{ bgcolor: "#555", mb: 1 }} />
+
+      <List>
+        {menuItems.map((item, index) => {
+          if (!item.children) {
+            return (
+              <ListItemButton
+                key={index}
+                component={NavLink}
+                to={item.path}
+                onClick={closeAll}
+              >
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            );
+          }
+
+          return (
+            <Box key={index}>
+              <ListItemButton onClick={() => setDropdownOpen(!dropdownOpen)}>
+                <ListItemText primary={item.label} />
+                {dropdownOpen ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+
+              <Collapse in={dropdownOpen}>
+                <List disablePadding>
+                  {item.children.map((child, i) => (
+                    <ListItemButton
+                      key={i}
+                      sx={{ pl: 4 }}
+                      component={NavLink}
+                      to={child.path}
+                      onClick={closeAll}
+                    >
+                      <ListItemText primary={child.label} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
+            </Box>
+          );
+        })}
+
+        {/* LOGIN / LOGOUT */}
+        <Divider sx={{ bgcolor: "#555", my: 1 }} />
+
+        {user ? (
+          <ListItemButton onClick={handleLogout}>
+            <LogoutIcon sx={{ mr: 1 }} />
+            <ListItemText primary="Logout" />
+          </ListItemButton>
+        ) : (
+          <ListItemButton onClick={handleLogin}>
+            <LoginIcon sx={{ mr: 1 }} />
+            <ListItemText primary="Login" />
+          </ListItemButton>
+        )}
       </List>
     </Box>
   );
+
+  /* ================= HEADER ================= */
   return (
-    // Header continue
     <>
-      <Box>
-        <AppBar component={"nav"} sx={{ bgcolor: "#33353d" }}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="open drawer"
-              edge="start"
-              sx={{ mr: 2, display: { md: "none" } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Avatar  >
-              <MenuBookOutlinedIcon sx={{color:'black'}}/>
-            </Avatar>
-            <Typography
-              color="white"
-              variant="h6"
-              component="div"
-              sx={{
-                flexGrow: 1,
-                fontFamily: "cursive",
-                letterSpacing: "1px",
-                fontWeight: "bolder",
-                ml: 1
-              }}
-            >
-              Genius Guidelines
-            </Typography>
-            {/* Options */}
-            <Box
-              sx={{
-                display: {
-                  xs: "none",
-                  md: "block",
-                },
-              }}
-            >
-              <List
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                }}
-              >
-                <ListItemButton component={NavLink} to="/">
-                  <ListItemText primary="Home" />
-                </ListItemButton>
-                <ListItemButton component={NavLink} to="/about">
-                  <ListItemText primary="About" />
-                </ListItemButton>
-                
-                <ListItemButton onClick={() => setStudentOpen(!studentOpen)}>
-                  <ListItemText primary="Student" />
-                  {studentOpen ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse
-                  in={studentOpen}
-                  sx={{
-                    position: "absolute",
-                    top: "75%",
-                    right: 0,
-                    bgcolor: "#343541",
-                    color: "white",
-                    width: "150px",
-                    boxShadow: 8,
-                    zIndex: 1300,
-                  }}
-                >
-                  <List disablePadding>
-                    <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/students">
-                      <ListItemText primary="Students" />
-                    </ListItemButton>
-                    <ListItemButton sx={{ pl: 4 }} component={NavLink} to="/report">
-                      <ListItemText primary="Reports" />
-                    </ListItemButton>
-                    <ListItemButton
-                      sx={{ pl: 4 }}
-                      component={NavLink}
-                      to="/about"
-                    >
-                      <ListItemText primary="Attendance" />
-                    </ListItemButton>
-                    <ListItemButton
-                      sx={{ pl: 4 }}
-                      component={NavLink}
-                      to="/student/fees"
-                    >
-                      <ListItemText primary="fees" />
-                    </ListItemButton>
-                  </List>
-                </Collapse>
-              </List>
-            </Box>
-          </Toolbar>
-        </AppBar>
-        <Box component={"nav"}>
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={() => setMobileOpen(!mobileOpen)}
+      <AppBar sx={{ bgcolor: "#33353d" }}>
+        <Toolbar>
+          {/* MOBILE MENU */}
+          <IconButton
+            color="inherit"
+            edge="start"
+            sx={{ display: { md: "none" }, mr: 1 }}
+            onClick={() => setMobileOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+
+          {/* LOGO */}
+          <Avatar>
+            <MenuBookOutlinedIcon sx={{ color: "black" }} />
+          </Avatar>
+
+          <Typography
             sx={{
-              display: {
-                xs: "block",
-                md: "none",
-              },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: "240px",
-              },
+              ml: 1,
+              flexGrow: 1,
+              fontFamily: "cursive",
+              fontWeight: "bold",
             }}
           >
-            {mobileDrawer()}
-          </Drawer>
-        </Box>
-      </Box>
+            Genius Guidelines
+          </Typography>
+
+          {/* DESKTOP MENU */}
+          <Box sx={{ display: { xs: "none", md: "block" } }}>
+            <List sx={{ display: "flex", alignItems: "center" }}>
+              {menuItems.map((item, index) => {
+                if (!item.children) {
+                  return (
+                    <ListItemButton
+                      key={index}
+                      component={NavLink}
+                      to={item.path}
+                    >
+                      <ListItemText primary={item.label} />
+                    </ListItemButton>
+                  );
+                }
+
+                return (
+                  <Box key={index} sx={{ position: "relative" }}>
+                    <ListItemButton
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      <ListItemText primary={item.label} />
+                      {dropdownOpen ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+
+                    <Collapse
+                      in={dropdownOpen}
+                      sx={{
+                        position: "absolute",
+                        top: "100%",
+                        right: 0,
+                        bgcolor: "#343541",
+                        zIndex: 10,
+                        width: 200,
+                      }}
+                    >
+                      <List disablePadding>
+                        {item.children.map((child, i) => (
+                          <ListItemButton
+                            key={i}
+                            component={NavLink}
+                            to={child.path}
+                            onClick={() => setDropdownOpen(false)}
+                          >
+                            <ListItemText primary={child.label} />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </Collapse>
+                  </Box>
+                );
+              })}
+
+              {/* LOGIN / LOGOUT */}
+              {user ? (
+                <ListItemButton onClick={handleLogout}>
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  <ListItemText primary="Logout" />
+                </ListItemButton>
+              ) : (
+                <ListItemButton onClick={handleLogin}>
+                  <LoginIcon sx={{ mr: 1 }} />
+                  <ListItemText primary="Login" />
+                </ListItemButton>
+              )}
+            </List>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* MOBILE DRAWER */}
+      <Drawer
+        open={mobileOpen}
+        onClose={closeAll}
+        sx={{ "& .MuiDrawer-paper": { width: 240 } }}
+      >
+        {mobileDrawer()}
+      </Drawer>
     </>
   );
 };

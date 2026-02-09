@@ -13,6 +13,9 @@ import LockIcon from "@mui/icons-material/Lock";
 import { useForm } from "react-hook-form";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../contexts/authcontext/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+
 
 
 function Login() {
@@ -23,6 +26,9 @@ function Login() {
   } = useForm();
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const onSubmit = async (data) => {
     setServerError("");
     setLoading(true);
@@ -34,26 +40,37 @@ function Login() {
       const res = await api.post("/auth/login", payload);
 
       if (res.data.responseCode === 200) {
-        toast.success(res?.data?.responseDescription);
-        localStorage.setItem("token",res?.data?.data?.token) ;
-        localStorage.setItem("role",res?.data?.data?.role) ;
-        localStorage.setItem("username",res?.data?.data?.userName) ;
-        localStorage.setItem("email",res?.data?.data?.email) ;
-        localStorage.setItem("isLog",true) ;
+        const userData = {
+          id: res.data.data.id,
+          username: res.data.data.userName,
+          email: res.data.data.email,
+          role: res.data.data.role,
+          token: res.data.data.token,
+        };
+
         
-      } else {
+        login(userData);
+
+        toast.success(res.data.responseDescription);
+
+        // 3️⃣ role-based redirect
+        if (userData.role === "ADMIN") navigate("/");
+        else if (userData.role === "STUDENT") navigate(`/student/${userData.id}`);
+        else navigate("/");
+      }
+      else {
         toast.error(res?.data?.responseDescription);
-        localStorage.setItem("isLog",false) ;
+        localStorage.setItem("isLog", false);
       }
     } catch (err) {
       console.log("ERROR FULL:", err);
-      
+
       const errorMsg = err.response?.data?.message || "Internal Server Error";
-      
-      console.log( errorMsg);
+
+      console.log(errorMsg);
       setServerError(errorMsg);
       toast.error("Error: " + errorMsg);
-      localStorage.setItem("isLog",false) ;
+      localStorage.setItem("isLog", false);
     } finally {
       setLoading(false);
     }
@@ -212,13 +229,15 @@ function Login() {
         >
           Not a user?
           <Typography
-            component="a"
+            component={Link}
             sx={{
               ml: 1,
               color: "#4da6ff",
               fontWeight: 600,
               cursor: "pointer",
+              textDecoration:'none'
             }}
+            to={'/register'}
           >
             Register now
           </Typography>

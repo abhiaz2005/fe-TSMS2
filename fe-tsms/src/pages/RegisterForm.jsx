@@ -16,6 +16,7 @@ import CakeIcon from "@mui/icons-material/Cake";
 import { useForm } from "react-hook-form";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 
 function RegisterForm() {
@@ -42,10 +43,10 @@ function RegisterForm() {
       const res = await api.post("/auth/register", payload);
 
       console.log("SUCCESS:", res.data);
-      if(res.data.responseCode=== 200) {
-        toast.success(res?.data?.responseDescription );
+      if (res.data.responseCode === 200) {
+        toast.success(res?.data?.responseDescription);
       } else {
-        toast.error(res?.data?.responseDescription );
+        toast.error(res?.data?.responseDescription);
       }
     } catch (err) {
       console.log("ERROR FULL:", err);
@@ -343,17 +344,20 @@ function RegisterForm() {
           fontSize={14}
         >
           Already a user?
-          <Typography
-            component="a"
-            sx={{
-              ml: 1,
-              color: "#4da6ff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Login now
-          </Typography>
+            <Typography
+              component={Link}
+              to={'/login'}
+              sx={{
+                ml: 1,
+                color: "#4da6ff",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontStyle:'none',
+                textDecoration:'none'
+              }}
+            >
+              Login now
+            </Typography>
         </Typography>
       </Paper>
     </Box>
