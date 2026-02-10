@@ -100,7 +100,6 @@ const Report = () => {
       return;
     }
 
-    // ✅ ADD ENTRY
     setTempEntries([
       ...tempEntries,
       {
@@ -282,9 +281,9 @@ const Report = () => {
       {/* Edit the Student mark */}
       <Dialog
         open={dialogOpen}
-        slots={{
-          transition: Transition,
-        }}
+        slots={{ transition: Transition }}
+        keepMounted
+        disableRestoreFocus
       >
         <Box
           sx={{
@@ -351,6 +350,8 @@ const Report = () => {
         slots={{ transition: Transition }}
         fullWidth
         maxWidth="sm"
+        keepMounted
+        disableRestoreFocus
       >
         {/* HEADER */}
         <Box
