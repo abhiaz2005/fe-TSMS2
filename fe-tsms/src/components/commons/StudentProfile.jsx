@@ -11,27 +11,12 @@ import {
     Typography,
     Chip,
 } from "@mui/material";
+import InfoRow from './InfoRow';
 
 
 
 const StudentProfile = ({ student }) => {
-    const InfoRow = ({ label, value }) => (
-        <Box
-            sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                borderBottom: "1px solid #555",
-                pb: 1,
-            }}
-        >
-            <Typography sx={{ color: "#bbb", fontWeight: 600 }}>
-                {label}
-            </Typography>
-            <Typography sx={{ color: "white", fontWeight: 600 }}>
-                {value || "-"}
-            </Typography>
-        </Box>
-    );
+    
     if (!student) {
         return <Typography color="white">Student not found 😕</Typography>;
     }

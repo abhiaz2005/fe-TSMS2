@@ -12,6 +12,11 @@ import {
   Drawer,
   Avatar,
   Divider,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  DialogTitle,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -29,13 +34,14 @@ import { toast } from "react-toastify";
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   const userId = user?.id;
 
- 
+
   const menuItems =
     typeof menuConfig?.[role] === "function"
       ? menuConfig[role](userId)
@@ -50,7 +56,8 @@ const Header = () => {
     logout();
     closeAll();
     navigate("/");
-    toast.success("Logged out successfully ✅");
+    setLogoutOpen(false) ;
+    toast.success("Logged out successfully ");
   };
 
   const handleLogin = () => {
@@ -116,7 +123,7 @@ const Header = () => {
         <Divider sx={{ bgcolor: "#555", my: 1 }} />
 
         {user ? (
-          <ListItemButton onClick={handleLogout}>
+          <ListItemButton onClick={()=>setLogoutOpen(true)}>
             <LogoutIcon sx={{ mr: 1 }} />
             <ListItemText primary="Logout" />
           </ListItemButton>
@@ -216,7 +223,7 @@ const Header = () => {
 
               {/* LOGIN / LOGOUT */}
               {user ? (
-                <ListItemButton onClick={handleLogout}>
+                <ListItemButton onClick={()=>setLogoutOpen(true)}>
                   <LogoutIcon sx={{ mr: 1 }} />
                   <ListItemText primary="Logout" />
                 </ListItemButton>
@@ -239,6 +246,33 @@ const Header = () => {
       >
         {mobileDrawer()}
       </Drawer>
+
+      {/* Pop up For logout */}
+      <Dialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(!logoutOpen)}
+        keepMounted
+        disableRestoreFocus
+      >
+        <DialogTitle color="#85838f">Confirm Logout</DialogTitle>
+        <DialogContent>
+          <Typography >
+            Are you sure you want to logout?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button  onClick={()=>setLogoutOpen(!logoutOpen)}>
+            Cancel
+          </Button>
+          <Button
+          variant="contained"
+          color="error"
+          onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

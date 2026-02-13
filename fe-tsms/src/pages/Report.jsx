@@ -147,7 +147,9 @@ const Report = () => {
       <Box
         sx={{
           my: 10,
-          // mx: 5,
+          mx: {
+            md: 2
+          },
           textAlign: "center",
           p: 2,
           color: "white",

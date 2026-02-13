@@ -13,6 +13,7 @@ import Report from "../pages/Report";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../pages/Login";
 import RegisterForm from "../pages/RegisterForm";
+import Exams from "../pages/Exams";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +30,7 @@ export const router = createBrowserRouter(
         {/* ADMIN ONLY */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route path="report" element={<Report />} />
+          <Route path="exams" element={<Exams />} />
           <Route path="students" element={<Students />} />
           <Route path="student/fees" element={<StudentFees />} />
         </Route>
