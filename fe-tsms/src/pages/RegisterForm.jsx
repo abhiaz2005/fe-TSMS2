@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   FormControl,
+  FormControlLabel,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -20,6 +22,7 @@ import BoyIcon from "@mui/icons-material/Boy";
 import WomanIcon from '@mui/icons-material/Woman';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
+import StreetviewIcon from '@mui/icons-material/Streetview';
 import VillaIcon from '@mui/icons-material/Villa';
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
 import { useForm } from "react-hook-form";
@@ -32,10 +35,30 @@ function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+
+
+  const handleSameAddress = (e) => {
+    const checked = e.target.checked;
+
+    if (checked) {
+      setValue("permanent_state", watch("present_state"));
+      setValue("permanent_city", watch("present_city"));
+      setValue("permanent_pincode", watch("present_pincode"));
+      setValue("permanent_street", watch("present_street"));
+    } else {
+      setValue("permanent_state", "");
+      setValue("permanent_city", "");
+      setValue("permanent_pincode", "");
+      setValue("permanent_street", "");
+    }
+  };
+
   const onSubmit = async (data) => {
     setServerError("");
     setLoading(true);
@@ -44,11 +67,27 @@ function RegisterForm() {
       const payload = {
         name: data.name,
         email: data.email,
-        // password: data.password,
         dob: data.dob,
-        // age: null,
+        phoneNo: data.phoneno,
+        motherName: data.motherName,
+        fatherName: data.fatherName,
+        studiedFrom: data.studiedFrom,
 
+        presentAddress: {
+          street: data.present_street,
+          state: data.present_state,
+          city: data.present_city,
+          pincode: data.present_pincode,
+        },
+
+        permanentAddress: {
+          street: data.permanent_street || data.present_street,
+          state: data.permanent_state || data.present_state,
+          city: data.permanent_city || data.present_city,
+          pincode: data.permanent_pincode || data.present_pincode,
+        },
       };
+
 
       const res = await api.post("/auth/register", payload);
 
@@ -73,6 +112,8 @@ function RegisterForm() {
     }
   };
 
+
+
   return (
     <Box
       sx={{
@@ -80,7 +121,7 @@ function RegisterForm() {
         alignItems: "center",
         justifyContent: "center",
         bgcolor: "#686262",
-        height: "100vh",
+        // height: '100vh',
       }}
     >
       <Paper
@@ -94,6 +135,7 @@ function RegisterForm() {
             xs: 5,
             md: 10,
           },
+          width: '100%',
           bgcolor: "#807e79",
           borderRadius: 6,
         }}
@@ -185,8 +227,8 @@ function RegisterForm() {
             type="email"
             fullWidth
             placeholder="Enter email"
-            error={!!errors.username}
-            helperText={errors.username?.message}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             {...register("email", { required: "Email is required!!" })}
           />
 
@@ -353,54 +395,13 @@ function RegisterForm() {
             label="Mother's name"
             fullWidth
             placeholder="Enter Mother's name"
-            error={!!errors.fatherName}
-            helperText={errors.fatherName?.message}
+            error={!!errors.motherName}
+            helperText={errors.motherName?.message}
             {...register("motherName", {
               required: "Mother Name is required!!"
             })}
           />
-          <TextField
-            sx={{
-              mb: 2,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#ddd",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#fff",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#d6d6d6",
-                },
-              },
-            }}
-            slotProps={{
-              input: {
-                sx: { color: "white" },
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
-                    <WomanIcon />
-                  </InputAdornment>
-                ),
-              },
-              inputLabel: {
-                sx: {
-                  color: "white",
-                  "&.Mui-focused": {
-                    color: "#ffdddd",
-                  },
-                },
-              },
-            }}
-            label="Mother's name"
-            fullWidth
-            placeholder="Enter Mother's name"
-            error={!!errors.fatherName}
-            helperText={errors.fatherName?.message}
-            {...register("motherName", {
-              required: "Mother Name is required!!"
-            })}
-          />
+
           <TextField
             sx={{
               mb: 2,
@@ -446,8 +447,8 @@ function RegisterForm() {
             })}
           />
           {/* Address section */}
-          <Typography color="white" variant="h6">
-            Address
+          <Typography sx={{ mb: 2 }} color="white" variant="h6">
+            Present Address
           </Typography>
           <TextField
             sx={{
@@ -469,7 +470,7 @@ function RegisterForm() {
                 sx: { color: "white" },
                 startAdornment: (
                   <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
-                    <VillaIcon/>
+                    <VillaIcon />
                   </InputAdornment>
                 ),
               },
@@ -485,9 +486,9 @@ function RegisterForm() {
             label="State"
             fullWidth
             placeholder="Enter state "
-            error={!!errors.state}
-            helperText={errors.state?.message}
-            {...register("state", {
+            error={!!errors.present_state}
+            helperText={errors.present_state?.message}
+            {...register("present_state", {
               required: "State is required!!"
             })}
           />
@@ -511,7 +512,7 @@ function RegisterForm() {
                 sx: { color: "white" },
                 startAdornment: (
                   <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
-                    <HomeFilled />
+                    <HomeFilledIcon />
                   </InputAdornment>
                 ),
               },
@@ -527,9 +528,9 @@ function RegisterForm() {
             label="City"
             fullWidth
             placeholder="Enter city "
-            error={!!errors.city}
-            helperText={errors.city?.message}
-            {...register("city", {
+            error={!!errors.present_city}
+            helperText={errors.present_city?.message}
+            {...register("present_city", {
               required: "City is required!!"
             })}
           />
@@ -551,6 +552,8 @@ function RegisterForm() {
             slotProps={{
               input: {
                 sx: { color: "white" },
+                maxLength: 6,
+                inputMode: "numeric",
                 startAdornment: (
                   <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
                     <PersonPinCircleIcon />
@@ -568,14 +571,23 @@ function RegisterForm() {
             }}
             label="Pincode"
             fullWidth
-            placeholder="Enter pincode "
-            error={!!errors.pincode}
-            helperText={errors.pincode?.message}
-            type="number"
-            {...register("pincode", {
-              required: "Pincode is required!!"
+            placeholder="Enter pincode"
+            error={!!errors.present_pincode}
+            helperText={errors.present_pincode?.message}
+            type="text"
+            {...register("present_pincode", {
+              required: "Pincode is required!!",
+              onChange: (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+              },
+              validate: (value) => {
+                if (value.length > 6) return "Can't be bigger than length 6";
+                if (value.length < 6) return "Pincode must be exactly 6 digits";
+                return true;
+              },
             })}
           />
+
           <TextField
             sx={{
               mb: 2,
@@ -612,9 +624,216 @@ function RegisterForm() {
             label="Street"
             fullWidth
             placeholder="Enter street "
-            error={!!errors.street}
-            helperText={errors.street?.message}
-            {...register("street", {
+            error={!!errors.present_street}
+            helperText={errors.present_street?.message}
+            {...register("present_street", {
+              required: "Street is required!!"
+            })}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 2,
+              flexWrap: "wrap"
+            }}
+          >
+            <Typography color="white" variant="h6">
+              Permanent Address
+            </Typography>
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={handleSameAddress}
+                  sx={{ color: "white" }}
+                />
+              }
+              label="Same as Present Address"
+              sx={{ color: "white" }}
+            />
+          </Box>
+
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <VillaIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            label="State"
+            fullWidth
+            placeholder="Enter state "
+            error={!!errors.permanent_state}
+            helperText={errors.permanent_state?.message}
+            {...register("permanent_state", {
+              required: "State is required!!"
+            })}
+          />
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <HomeFilledIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            label="City"
+            fullWidth
+            placeholder="Enter city "
+            error={!!errors.permanent_city}
+            helperText={errors.permanent_city?.message}
+            {...register("permanent_city", {
+              required: "City is required!!"
+            })}
+          />
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                maxLength: 6,
+                inputMode: "numeric",
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <PersonPinCircleIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            label="Pincode"
+            fullWidth
+            placeholder="Enter pincode"
+            error={!!errors.permanent_pincode}
+            helperText={errors.permanent_pincode?.message}
+            type="text"
+            {...register("permanent_pincode", {
+              required: "Pincode is required!!",
+              onChange: (e) => {
+                // 🔥 ONLY numbers allowed
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+              },
+              validate: (value) => {
+                if (value.length > 6) return "Can't be bigger than length 6";
+                if (value.length < 6) return "Pincode must be exactly 6 digits";
+                return true;
+              },
+            })}
+          />
+
+
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <StreetviewIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            label="Street"
+            fullWidth
+            placeholder="Enter street "
+            error={!!errors.permanent_street}
+            helperText={errors.permanent_street?.message}
+            {...register("permanent_street", {
               required: "Street is required!!"
             })}
           />
@@ -633,7 +852,7 @@ function RegisterForm() {
                 bgcolor: "#ff3b3b",
               },
             }}
-          > 
+          >
             {loading ? (
               <CircularProgress sx={{ color: "white" }} size={22} />
             ) : (
