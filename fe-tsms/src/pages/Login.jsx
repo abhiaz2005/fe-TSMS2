@@ -15,6 +15,8 @@ import { api } from "../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../contexts/authcontext/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { url } from "../config/apiConfig";
+
 
 
 
@@ -37,7 +39,7 @@ function Login() {
         email: data.username,
         password: data.password,
       };
-      const res = await api.post("/auth/login", payload);
+      const res = await api.post(url.login, payload);
 
       if (res.data.responseCode === 200) {
         const userData = {
@@ -48,15 +50,13 @@ function Login() {
           token: res.data.data.token,
         };
 
-        
+
         login(userData);
 
         toast.success(res.data.responseDescription);
 
-        // 3️⃣ role-based redirect
-        if (userData.role === "ADMIN") navigate("/");
-        else if (userData.role === "STUDENT") navigate(`/student/${userData.id}`);
-        else navigate("/");
+
+        navigate("/");
       }
       else {
         toast.error(res?.data?.responseDescription);
@@ -235,7 +235,7 @@ function Login() {
               color: "#4da6ff",
               fontWeight: 600,
               cursor: "pointer",
-              textDecoration:'none'
+              textDecoration: 'none'
             }}
             to={'/register'}
           >

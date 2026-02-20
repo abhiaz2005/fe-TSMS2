@@ -25,10 +25,13 @@ import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import StreetviewIcon from '@mui/icons-material/Streetview';
 import VillaIcon from '@mui/icons-material/Villa';
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
+import WcIcon from '@mui/icons-material/Wc';
+import SchoolIcon from '@mui/icons-material/School';
 import { useForm } from "react-hook-form";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { url } from '../config/apiConfig'
 
 
 function RegisterForm() {
@@ -68,6 +71,8 @@ function RegisterForm() {
         name: data.name,
         email: data.email,
         dob: data.dob,
+        gender: data.gender,
+        section: data.class,
         phoneNo: data.phoneno,
         motherName: data.motherName,
         fatherName: data.fatherName,
@@ -88,8 +93,9 @@ function RegisterForm() {
         },
       };
 
+      // console.log(payload)
 
-      const res = await api.post("/auth/register", payload);
+      const res = await api.post(url.registerUser, payload);
 
       console.log("SUCCESS:", res.data);
       if (res.data.responseCode === 200) {
@@ -106,7 +112,7 @@ function RegisterForm() {
 
       console.log("ERROR MSG:", errorMsg);
       setServerError(errorMsg);
-      toast.error("Error: " + errorMsg);
+      toast.error("Error "+errorMsg);
     } finally {
       setLoading(false);
     }
@@ -125,15 +131,18 @@ function RegisterForm() {
       }}
     >
       <Paper
-        elevation={8}
+        elevation={12}
         sx={{
           px: {
-            md: 10,
+            md: 25,
             xs: 3,
           },
           py: {
             xs: 5,
             md: 10,
+          },
+          mx:{
+            md:28,
           },
           width: '100%',
           bgcolor: "#807e79",
@@ -273,6 +282,109 @@ function RegisterForm() {
             helperText={errors.phoneno?.message}
             {...register("phoneno", { required: "Phone Number is required!!" })}
           />
+          
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <SchoolIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            select
+            label="Class"
+            fullWidth
+            defaultValue=""
+            error={!!errors.class}
+            helperText={errors.class?.message}
+            {...register("class", {
+              required: "Class is required",
+            })}
+          >
+            <MenuItem value="3rd">3rd</MenuItem>
+            <MenuItem value="4th">4th</MenuItem>
+            <MenuItem value="5th">5th</MenuItem>
+            <MenuItem value="6th">6th</MenuItem>
+            <MenuItem value="7th">7th</MenuItem>
+            <MenuItem value="8th">8th</MenuItem>
+            <MenuItem value="9th">9th</MenuItem>
+            <MenuItem value="10th">10th</MenuItem>
+
+          </TextField>
+          <TextField
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "#ddd",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#fff",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d6d6d6",
+                },
+              },
+            }}
+            slotProps={{
+              input: {
+                sx: { color: "white" },
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ color: "#dbcbcb" }}>
+                    <WcIcon />
+                  </InputAdornment>
+                ),
+              },
+              inputLabel: {
+                sx: {
+                  color: "white",
+                  "&.Mui-focused": {
+                    color: "#ffdddd",
+                  },
+                },
+              },
+            }}
+            select
+            label="Gender"
+            fullWidth
+            defaultValue=""
+            error={!!errors.gender}
+            helperText={errors.gender?.message}
+            {...register("gender", {
+              required: "Gender is required",
+            })}
+          >
+            <MenuItem value="MALE">Male</MenuItem>
+            <MenuItem value="FEMALE">Female</MenuItem>
+            <MenuItem value="OTHERS">Others</MenuItem>
+          </TextField>
+
+
           <TextField
             sx={{
               mb: 2,
@@ -862,7 +974,7 @@ function RegisterForm() {
         </form>
         {serverError && (
           <Typography
-            color="#ff3b3b"
+            color="#534e4e"
             textAlign="center"
             sx={{ my: 2, fontWeight: 600 }}
           >
@@ -872,7 +984,7 @@ function RegisterForm() {
         <Typography
           textAlign="center"
           sx={{ mt: 3 }}
-          color="#ccc"
+          color="#332d2d"
           fontSize={14}
         >
           Already a user?
