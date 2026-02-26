@@ -44,6 +44,9 @@ function RegisterForm() {
   } = useForm();
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [showOtpBox, setShowOtpBox] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [tempFormData, setTempFormData] = useState(null);
 
 
   const handleSameAddress = (e) => {
@@ -67,57 +70,95 @@ function RegisterForm() {
     setLoading(true);
 
     try {
-      const payload = {
-        name: data.name,
+      // STEP 1: Send OTP API call
+      await api.post("/send-otp", {
         email: data.email,
-        dob: data.dob,
-        gender: data.gender,
-        section: data.class,
-        phoneNo: data.phoneno,
-        motherName: data.motherName,
-        fatherName: data.fatherName,
-        studiedFrom: data.studiedFrom,
+      });
 
-        presentAddress: {
-          street: data.present_street,
-          state: data.present_state,
-          city: data.present_city,
-          pincode: data.present_pincode,
-        },
+      // Save form temporarily
+      setTempFormData(data);
 
-        permanentAddress: {
-          street: data.permanent_street || data.present_street,
-          state: data.permanent_state || data.present_state,
-          city: data.permanent_city || data.present_city,
-          pincode: data.permanent_pincode || data.present_pincode,
-        },
-      };
+      // Show OTP box
+      setShowOtpBox(true);
 
-      // console.log(payload)
-
-      const res = await api.post(url.registerUser, payload);
-
-      console.log("SUCCESS:", res.data);
-      if (res.data.responseCode === 200) {
-        toast.success(res?.data?.responseDescription);
-      } else {
-        toast.error(res?.data?.responseDescription);
-      }
+      toast.success("OTP Sent Successfully");
     } catch (err) {
-      console.log("ERROR FULL:", err);
-
-      const errorMsg =
-        err.response?.data?.message ||
-        "Internal Server Error";
-
-      console.log("ERROR MSG:", errorMsg);
-      setServerError(errorMsg);
-      toast.error("Error "+errorMsg);
+      toast.error("Failed to send OTP");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      toast.error("Enter OTP");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // STEP 2: Verify OTP
+      const otpRes = await api.post("/verify-otp", {
+        email: tempFormData.email,
+        otp: otp,
+      });
+
+      if (otpRes.data.responseCode !== 200) {
+        toast.error(otpRes.data.responseDescription);
+        setShowOtpBox(false);
+      }
+
+
+      // STEP 3: Register API call
+      const payload = {
+        name: tempFormData.name,
+        email: tempFormData.email,
+        dob: tempFormData.dob,
+        gender: tempFormData.gender,
+        section: tempFormData.class,
+        phoneNo: tempFormData.phoneno,
+        motherName: tempFormData.motherName,
+        fatherName: tempFormData.fatherName,
+        studiedFrom: tempFormData.studiedFrom,
+
+        presentAddress: {
+          street: tempFormData.present_street,
+          state: tempFormData.present_state,
+          city: tempFormData.present_city,
+          pincode: tempFormData.present_pincode,
+        },
+
+        permanentAddress: {
+          street:
+            tempFormData.permanent_street ||
+            tempFormData.present_street,
+          state:
+            tempFormData.permanent_state ||
+            tempFormData.present_state,
+          city:
+            tempFormData.permanent_city ||
+            tempFormData.present_city,
+          pincode:
+            tempFormData.permanent_pincode ||
+            tempFormData.present_pincode,
+        },
+      };
+
+      const res = await api.post(url.registerUser, payload);
+
+      if (res.data.responseCode === 200) {
+        toast.success("Registered Successfully");
+        setShowOtpBox(false);
+      } else {
+        toast.error(res.data.responseDescription);
+      }
+    } catch (err) {
+      toast.error("Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
@@ -141,8 +182,8 @@ function RegisterForm() {
             xs: 5,
             md: 10,
           },
-          mx:{
-            md:28,
+          mx: {
+            md: 28,
           },
           width: '100%',
           bgcolor: "#807e79",
@@ -282,7 +323,7 @@ function RegisterForm() {
             helperText={errors.phoneno?.message}
             {...register("phoneno", { required: "Phone Number is required!!" })}
           />
-          
+
           <TextField
             sx={{
               mb: 2,
@@ -972,6 +1013,47 @@ function RegisterForm() {
             )}
           </Button>
         </form>
+        {showOtpBox && (
+          <Box
+            sx={{
+              mt: 3,
+              p: 3,
+              borderRadius: 3,
+              bgcolor: "#6b6666",
+            }}
+          >
+            <Typography color="white" mb={2}>
+              Enter OTP sent to your email
+            </Typography>
+
+            <TextField
+              fullWidth
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              sx={{ mb: 2 }}
+              inputProps={{ maxLength: 6 }}
+            />
+
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleVerifyOtp}
+              disabled={loading}
+              sx={{
+                py: 1.2,
+                bgcolor: "#4caf50",
+                "&:hover": { bgcolor: "#3d8b40" },
+              }}
+            >
+              {loading ? (
+                <CircularProgress sx={{ color: "white" }} size={22} />
+              ) : (
+                "Verify OTP"
+              )}
+            </Button>
+          </Box>
+        )}
         {serverError && (
           <Typography
             color="#534e4e"
