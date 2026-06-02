@@ -7,8 +7,8 @@ import {
   FormControl,
   FormControlLabel,
   InputAdornment,
-  InputLabel,
   MenuItem,
+  InputLabel,
   Paper,
   Select,
   TextField,
@@ -26,7 +26,6 @@ import StreetviewIcon from '@mui/icons-material/Streetview';
 import VillaIcon from '@mui/icons-material/Villa';
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
 import WcIcon from '@mui/icons-material/Wc';
-import SchoolIcon from '@mui/icons-material/School';
 import { useForm } from "react-hook-form";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
@@ -44,9 +43,9 @@ function RegisterForm() {
   } = useForm();
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
-  const [showOtpBox, setShowOtpBox] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [tempFormData, setTempFormData] = useState(null);
+  // const [showOtpBox, setShowOtpBox] = useState(false);
+  // const [otp, setOtp] = useState("");
+  // const [tempFormData, setTempFormData] = useState(null);
 
 
   const handleSameAddress = (e) => {
@@ -65,100 +64,158 @@ function RegisterForm() {
     }
   };
 
+  // const onSubmit = async (data) => {
+  //   setServerError("");
+  //   setLoading(true);
+
+  //   try {
+  //     // STEP 1: Send OTP API call
+  //     await api.post("/send-otp", {
+  //       email: data.email,
+  //     });
+
+  //     // Save form temporarily
+  //     setTempFormData(data);
+
+  //     // Show OTP box
+  //     setShowOtpBox(true);
+
+  //     toast.success("OTP Sent Successfully");
+  //   } catch (err) {
+  //     toast.error("Failed to send OTP");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
     setServerError("");
     setLoading(true);
 
     try {
-      // STEP 1: Send OTP API call
-      await api.post("/send-otp", {
-        email: data.email,
-      });
-
-      // Save form temporarily
-      setTempFormData(data);
-
-      // Show OTP box
-      setShowOtpBox(true);
-
-      toast.success("OTP Sent Successfully");
-    } catch (err) {
-      toast.error("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!otp) {
-      toast.error("Enter OTP");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // STEP 2: Verify OTP
-      const otpRes = await api.post("/verify-otp", {
-        email: tempFormData.email,
-        otp: otp,
-      });
-
-      if (otpRes.data.responseCode !== 200) {
-        toast.error(otpRes.data.responseDescription);
-        setShowOtpBox(false);
-      }
-
-
-      // STEP 3: Register API call
       const payload = {
-        name: tempFormData.name,
-        email: tempFormData.email,
-        dob: tempFormData.dob,
-        gender: tempFormData.gender,
-        section: tempFormData.class,
-        phoneNo: tempFormData.phoneno,
-        motherName: tempFormData.motherName,
-        fatherName: tempFormData.fatherName,
-        studiedFrom: tempFormData.studiedFrom,
+        name: data.name,
+        email: data.email,
+        dob: data.dob,
+        gender: data.gender,
+        phoneNo: data.phoneno,
+        fatherName: data.fatherName,
+        motherName: data.motherName,
+        studiedFrom: data.studiedFrom,
 
         presentAddress: {
-          street: tempFormData.present_street,
-          state: tempFormData.present_state,
-          city: tempFormData.present_city,
-          pincode: tempFormData.present_pincode,
+          street: data.present_street,
+          state: data.present_state,
+          city: data.present_city,
+          pincode: data.present_pincode,
         },
 
         permanentAddress: {
           street:
-            tempFormData.permanent_street ||
-            tempFormData.present_street,
+            data.permanent_street ||
+            data.present_street,
           state:
-            tempFormData.permanent_state ||
-            tempFormData.present_state,
+            data.permanent_state ||
+            data.present_state,
           city:
-            tempFormData.permanent_city ||
-            tempFormData.present_city,
+            data.permanent_city ||
+            data.present_city,
           pincode:
-            tempFormData.permanent_pincode ||
-            tempFormData.present_pincode,
+            data.permanent_pincode ||
+            data.present_pincode,
         },
       };
 
-      const res = await api.post(url.registerUser, payload);
+      const res = await api.post(
+        url.registerUser,
+        payload
+      );
 
       if (res.data.responseCode === 200) {
         toast.success("Registered Successfully");
-        setShowOtpBox(false);
       } else {
         toast.error(res.data.responseDescription);
       }
+
     } catch (err) {
-      toast.error("Invalid OTP");
+      toast.error(
+        err.response?.data?.message ||
+        "Registration Failed"
+      );
     } finally {
       setLoading(false);
     }
   };
+  // const handleVerifyOtp = async () => {
+  //   if (!otp) {
+  //     toast.error("Enter OTP");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     // STEP 2: Verify OTP
+  //     const otpRes = await api.post("/verify-otp", {
+  //       email: tempFormData.email,
+  //       otp: otp,
+  //     });
+
+  //     if (otpRes.data.responseCode !== 200) {
+  //       toast.error(otpRes.data.responseDescription);
+  //       setShowOtpBox(false);
+  //     }
+
+
+  //     // STEP 3: Register API call
+  //     const payload = {
+  //       name: tempFormData.name,
+  //       email: tempFormData.email,
+  //       dob: tempFormData.dob,
+  //       gender: tempFormData.gender,
+  //       section: tempFormData.class,
+  //       phoneNo: tempFormData.phoneno,
+  //       motherName: tempFormData.motherName,
+  //       fatherName: tempFormData.fatherName,
+  //       studiedFrom: tempFormData.studiedFrom,
+
+  //       presentAddress: {
+  //         street: tempFormData.present_street,
+  //         state: tempFormData.present_state,
+  //         city: tempFormData.present_city,
+  //         pincode: tempFormData.present_pincode,
+  //       },
+
+  //       permanentAddress: {
+  //         street:
+  //           tempFormData.permanent_street ||
+  //           tempFormData.present_street,
+  //         state:
+  //           tempFormData.permanent_state ||
+  //           tempFormData.present_state,
+  //         city:
+  //           tempFormData.permanent_city ||
+  //           tempFormData.present_city,
+  //         pincode:
+  //           tempFormData.permanent_pincode ||
+  //           tempFormData.present_pincode,
+  //       },
+  //     };
+
+  //     const res = await api.post(url.registerUser, payload);
+
+  //     if (res.data.responseCode === 200) {
+  //       toast.success("Registered Successfully");
+  //       setShowOtpBox(false);
+  //     } else {
+  //       toast.error(res.data.responseDescription);
+  //     }
+  //   } catch (err) {
+  //     toast.error("Invalid OTP");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
 
   return (
@@ -324,7 +381,7 @@ function RegisterForm() {
             {...register("phoneno", { required: "Phone Number is required!!" })}
           />
 
-          <TextField
+          {/* <TextField
             sx={{
               mb: 2,
               "& .MuiOutlinedInput-root": {
@@ -376,7 +433,7 @@ function RegisterForm() {
             <MenuItem value="9th">9th</MenuItem>
             <MenuItem value="10th">10th</MenuItem>
 
-          </TextField>
+          </TextField> */}
           <TextField
             sx={{
               mb: 2,
@@ -1013,7 +1070,7 @@ function RegisterForm() {
             )}
           </Button>
         </form>
-        {showOtpBox && (
+        {/* {showOtpBox && (
           <Box
             sx={{
               mt: 3,
@@ -1053,7 +1110,7 @@ function RegisterForm() {
               )}
             </Button>
           </Box>
-        )}
+        )} */}
         {serverError && (
           <Typography
             color="#534e4e"
