@@ -30,7 +30,8 @@ function Login() {
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+  const { logout } = useAuth();
+
 
   const onSubmit = async (data) => {
     setServerError("");
@@ -64,14 +65,16 @@ function Login() {
         localStorage.setItem("isLog", false);
       }
     } catch (err) {
-      console.log("ERROR FULL:", err);
-
-      const errorMsg = err.response?.data?.message || "Internal Server Error";
-
-      console.log(errorMsg);
-      setServerError(errorMsg);
-      toast.error("Error: " + errorMsg);
-      localStorage.setItem("isLog", false);
+      if (err.response.status == 401) {
+        logout();
+        localStorage.setItem("isLog", false);
+        navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to login"
+        );
+      }
     } finally {
       setLoading(false);
     }

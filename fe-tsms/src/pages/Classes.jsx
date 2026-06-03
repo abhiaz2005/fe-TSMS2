@@ -24,10 +24,13 @@ import { api } from "../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { url } from "../config/apiConfig";
+import { useAuth } from "../contexts/authcontext/AuthContext";
+
 
 const Classes = () => {
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const [open, setOpen] = useState(false);
     const [classList, setClassList] = useState([]);
@@ -65,13 +68,17 @@ const Classes = () => {
 
             setClassList(res.data.data || []);
         } catch (err) {
-            if (err.response?.status === 401) {
+            if (err.response.status == 401) {
+                logout();
+                localStorage.setItem("isLog", false);
                 navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            }else {
+                toast.error(
+                    err.response?.data?.responseDescription || "Failed to load classes"
+                );
             }
 
-            toast.error(
-                err.response?.data?.message || "Failed to load classes"
-            );
         }
     };
 
@@ -109,9 +116,16 @@ const Classes = () => {
             handleClose();
 
         } catch (err) {
-            toast.error(
-                err.response?.data?.message || "Failed to add class"
-            );
+             if (err.response.status == 401) {
+                logout();
+                localStorage.setItem("isLog", false);
+                navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            }else {
+                toast.error(
+                    err.response?.data?.responseDescription || "Failed to add class"
+                );
+            }
         }
     };
 
@@ -147,9 +161,16 @@ const Classes = () => {
             handleClose();
 
         } catch (err) {
-            toast.error(
-                err.response?.data?.message || "Failed to update class"
-            );
+             if (err.response.status == 401) {
+                logout();
+                localStorage.setItem("isLog", false);
+                navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            }else {
+                toast.error(
+                    err.response?.data?.responseDescription || "Failed to update class"
+                );
+            }
         }
     };
 
@@ -177,9 +198,16 @@ const Classes = () => {
             toast.success("Class deleted successfully");
 
         } catch (err) {
-            toast.error(
-                err.response?.data?.message || "Failed to delete class"
-            );
+             if (err.response.status == 401) {
+                logout();
+                localStorage.setItem("isLog", false);
+                navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            }else {
+                toast.error(
+                    err.response?.data?.responseDescription || "Failed to delete class"
+                );
+            }
         }
     };
 
@@ -213,7 +241,7 @@ const Classes = () => {
                 </IconButton>
             </Box>
 
-            <Box sx={{ px: 5 ,mb:5}}>
+            <Box sx={{ px: 5, mb: 5 }}>
                 <TableContainer
                     component={Paper}
                     sx={{

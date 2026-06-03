@@ -12,5 +12,6 @@ export const url = {
     addClass: "/api/add/class",
     deleteClass: "/api/delete/class",
     getAllClass: "/api/get/all/class",
-    addFees:"api/fees/add"
+    addFees:"api/fees/add",
+    updateStudent:"/api/update/user"
 }

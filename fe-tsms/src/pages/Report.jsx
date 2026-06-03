@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import {
   Avatar,
@@ -39,6 +39,15 @@ import CreateIcon from "@mui/icons-material/Create";
 import CloseIcon from "@mui/icons-material/Close";
 import { studentMarks } from "../data/student.js";
 import { examList } from "../data/exams.js";
+import { api } from "../api/axios.js";
+import { url } from "../config/apiConfig.js";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/authcontext/AuthContext.jsx";
+import { toast } from "react-toastify";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 // transition
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -54,7 +63,7 @@ const Report = () => {
     fullMark: Number(0),
     examName: "",
   });
-  const [selectedStudentIndex, setSelectedStudentIndex] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState("");
   const [selectExamName, setSelectExamName] = useState("");
 
   const [newExam, setNewExam] = useState({
@@ -68,10 +77,24 @@ const Report = () => {
     message: "",
     severity: "error",
   });
+  const [students, setStudents] = useState([]);
+  const [classList, setClassList] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+
+  const filteredStudents = students.filter((s) => {
+    if (selectedClass && s.section !== selectedClass) return false;
+    return true;
+  });
+
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleButtonDuplicateCheck = () => {
     if (
-      selectedStudentIndex === "" ||
+      selectedStudentId === "" ||
       newExam.examName === "" ||
       newExam.securedMark === ""
     ) {
@@ -86,7 +109,7 @@ const Report = () => {
     // 🔴 DUPLICATE CHECK
     const isDuplicate = tempEntries.some(
       (item) =>
-        item.studentIndex === selectedStudentIndex &&
+        item.studentIndex === selectedStudentId &&
         item.examName === newExam.examName,
     );
 
@@ -103,8 +126,8 @@ const Report = () => {
     setTempEntries([
       ...tempEntries,
       {
-        studentIndex: selectedStudentIndex,
-        studentName: studentMarks[selectedStudentIndex].name,
+        studentIndex: selectedStudentId,
+        studentName: studentMarks[selectedStudentId].name,
         examName: newExam.examName,
         securedMark: newExam.securedMark,
         fullMark: newExam.fullMark,
@@ -119,6 +142,56 @@ const Report = () => {
     });
     setSelectExamName("");
   };
+
+  const fetchStudents = async () => {
+    try {
+      const res = await api.get(url.getAllStudent, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStudents(res.data.data || []);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        logout();
+        localStorage.setItem("isLog", false);
+        navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(err.response?.data?.responseDescription || "Something went wrong");
+      }
+    }
+  };
+
+  const fetchClasses = async () => {
+    try {
+      const res = await api.get(url.getAllClass, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setClassList(res.data.data || []);
+    } catch (err) {
+      if (err.response.status == 401) {
+        logout();
+        localStorage.setItem("isLog", false);
+        navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to load classes"
+        );
+      }
+
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchClasses();
+      await fetchStudents();
+    };
+    loadData();
+  }, []);
 
   const handleExamSelect = (e) => {
     const examIndex = e.target.value;
@@ -158,14 +231,71 @@ const Report = () => {
           },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
-          <Typography variant="h5">Upload New</Typography>
-          <IconButton
-            sx={{ color: "#67686e", ml: 1 }}
-            onClick={() => setAddDialogOpen(!addDialogOpen)}
-          >
-            <AddCircleIcon />
-          </IconButton>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="h5">Reports</Typography>
+            <IconButton sx={{ color: "#67686e" }} onClick={() => setAddDialogOpen(!addDialogOpen)}>
+              <AddCircleIcon />
+            </IconButton>
+          </Box>
+
+          {/* Filters */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <Select
+                value={selectedClass}
+                displayEmpty
+                onChange={(e) => setSelectedClass(e.target.value)}
+                sx={{
+                  color: "white", bgcolor: "#404147", borderRadius: 2,
+                  "& .MuiOutlinedInput-notchedOutline": { border: "ActiveBorder" },
+                  "& .MuiSvgIcon-root": { color: "white" },
+                }}
+              >
+                {/* <MenuItem value="">All Classes</MenuItem> */}
+                {classList.map((cls) => (
+                  <MenuItem key={cls.id} value={cls.studentClass}>{cls.studentClass}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                views={["year"]}
+                value={dayjs().year(selectedYear)}
+                minDate={dayjs("2005")}
+                // maxDate={dayjs("2028")}
+                onChange={(val) => setSelectedYear(val.year())}
+                slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: {
+                        width: 110,
+                        "& .MuiInputBase-input": { color: "white" },
+                        "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                        "& .MuiSvgIcon-root": { color: "green" },
+                        bgcolor: "#8d8e94",
+                        borderRadius: 2,
+                      },
+                    },
+                    // ✅ Popup calendar styling
+                    desktopPaper: {
+                      sx: {
+                        bgcolor: "#959597",
+                        "& .MuiPickersYear-yearButton": { color: "white" },
+                        "& .MuiPickersYear-yearButton.Mui-selected": {
+                          bgcolor: "#6a747e",
+                          color: "white",
+                        },
+                        "& .MuiPickersYear-yearButton:hover": {
+                          bgcolor: "#978383",
+                        },
+                      },
+                    },
+                  }}
+              />
+            </LocalizationProvider>
+          </Box>
         </Box>
 
         {studentMarks.map((mark, index) => (
@@ -381,13 +511,13 @@ const Report = () => {
           <FormControl fullWidth margin="dense">
             <InputLabel>Student</InputLabel>
             <Select
-              value={selectedStudentIndex}
+              value={selectedStudentId}
               label="Student"
-              onChange={(e) => setSelectedStudentIndex(e.target.value)}
+              onChange={(e) => setSelectedStudentId(e.target.value)}
             >
-              {studentMarks.map((s, i) => (
+              {students.map((s, i) => (
                 <MenuItem key={i} value={i}>
-                  {s.name} ({s.class})
+                  {s.name} ({s.section})
                 </MenuItem>
               ))}
             </Select>

@@ -29,8 +29,10 @@ import WcIcon from '@mui/icons-material/Wc';
 import { useForm } from "react-hook-form";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { url } from '../config/apiConfig'
+import { useAuth } from "../contexts/authcontext/AuthContext";
+
 
 
 function RegisterForm() {
@@ -46,6 +48,9 @@ function RegisterForm() {
   // const [showOtpBox, setShowOtpBox] = useState(false);
   // const [otp, setOtp] = useState("");
   // const [tempFormData, setTempFormData] = useState(null);
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
 
   const handleSameAddress = (e) => {
@@ -138,10 +143,16 @@ function RegisterForm() {
       }
 
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-        "Registration Failed"
-      );
+      if (err.response.status == 401) {
+        logout();
+        localStorage.setItem("isLog", false);
+        navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Registration failed"
+        );
+      }
     } finally {
       setLoading(false);
     }

@@ -95,10 +95,15 @@ const Exams = () => {
     } catch (err) {
       console.log(err.response);
 
-      toast.error(err.response.data.message);
       if (err.response.status == 401) {
+        logout();
         localStorage.setItem("isLog", false);
         navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to load exams"
+        );
       }
     }
   };
@@ -115,10 +120,15 @@ const Exams = () => {
     } catch (err) {
       console.log(err);
       if (err.response.status == 401) {
+        logout();
         localStorage.setItem("isLog", false);
         navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to load class"
+        );
       }
-      toast.error("Failed to load classes");
     }
   };
 
@@ -160,10 +170,15 @@ const Exams = () => {
       toast.success("Exam added successfully");
 
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Internal Server Error";
       if (err.response.status == 401) {
+        logout();
         localStorage.setItem("isLog", false);
         navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to submit exams"
+        );
       }
     }
   };
@@ -219,12 +234,15 @@ const Exams = () => {
 
     } catch (err) {
       if (err.response.status == 401) {
+        logout();
         localStorage.setItem("isLog", false);
         navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to update exam"
+        );
       }
-      toast.error(
-        err.response?.data?.message || "Failed to update exam"
-      );
     }
   };
 
@@ -248,9 +266,16 @@ const Exams = () => {
       toast.success("Exam deleted successfully");
 
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to delete exam"
-      );
+      if (err.response.status == 401) {
+        logout();
+        localStorage.setItem("isLog", false);
+        navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(
+          err.response?.data?.responseDescription || "Failed to delete exams"
+        );
+      }
     }
   };
 
