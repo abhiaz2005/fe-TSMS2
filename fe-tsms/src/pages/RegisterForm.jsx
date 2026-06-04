@@ -149,8 +149,9 @@ function RegisterForm() {
         navigate("/");
         toast.error(err.response?.data?.responseDescription || "Please login again");
       } else {
+        console.error(err.response?.data)
         toast.error(
-          err.response?.data?.responseDescription || "Registration failed"
+          err.response?.data?.message[0] || "Registration failed"
         );
       }
     } finally {

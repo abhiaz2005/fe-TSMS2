@@ -15,362 +15,236 @@ import {
   TableHead,
   TableRow,
   Paper,
-  MenuItem
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useState, useEffect } from "react";
 import { api } from "../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../contexts/authcontext/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { url } from "../config/apiConfig";
-import CreateIcon from "@mui/icons-material/Create";
-import DeleteIcon from '@mui/icons-material/Delete';
-
-
-
 
 const Exams = () => {
   const token = localStorage.getItem("token");
-
-  //useState
-  const [open, setOpen] = useState(false);
-  const [examList, setExamList] = useState([]);
-  const [classList, setClassList] = useState([]);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    examName: "",
-    studentClass: "",
-    fullMark: ""
-  });
+
+  const [open, setOpen] = useState(false);
+  const [examList, setExamList] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
 
-  const handleOpen = () => setOpen(true);
-  // const handleClose = () => setOpen(false);
-  const handleClose = () => {
-    setOpen(false);
+  // ── Subject → ClassSubject cascade ─────────────────────────
+  const [groupedSubjects, setGroupedSubjects] = useState([]); // [{subject, classSubjects}]
+  const [classSubjectsForSelected, setClassSubjectsForSelected] = useState([]);
 
-    setEditMode(false);
-    setEditingId(null);
+  const [form, setForm] = useState({
+    examName: "",
+    subjectId: "",
+    classSubjectId: "",
+    fullMark: "",
+  });
 
-    setForm({
-      examName: "",
-      studentClass: "",
-      fullMark: ""
-    });
+  // ── Auth error ──────────────────────────────────────────────
+  const handleErr = (err, fallback) => {
+    if (err.response?.status === 401) {
+      logout();
+      localStorage.setItem("isLog", false);
+      navigate("/");
+      toast.error(err.response?.data?.responseDescription || "Please login again");
+    } else {
+      toast.error(err.response?.data?.responseDescription || fallback);
+    }
   };
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
+  // ── Fetch ───────────────────────────────────────────────────
   const fetchExams = async () => {
     try {
-      const res = await api.get(
-        url.getAllExam,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-
-      const exams = res.data.data.map((item) => ({
+      const res = await api.get(url.getAllExam, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const exams = (res.data.data || []).map((item) => ({
         id: item.id,
-        name: item.examName,
+        examName: item.examName,
         fullMark: item.fullMark,
-        studentClass: item.studentClass
+        subjectName: item.classSubject?.subject?.name || "-",
+        className: item.classSubject?.studentClass?.studentClass || "-",
+        classSubjectId: item.classSubject?.id,
       }));
-
       setExamList(exams);
-
-    } catch (err) {
-      console.log(err.response);
-
-      if (err.response.status == 401) {
-        logout();
-        localStorage.setItem("isLog", false);
-        navigate("/");
-        toast.error(err.response?.data?.responseDescription || "Please login again");
-      } else {
-        toast.error(
-          err.response?.data?.responseDescription || "Failed to load exams"
-        );
-      }
-    }
+    } catch (err) { handleErr(err, "Failed to load exams"); }
   };
 
-  const fetchClasses = async () => {
-    try {
-      const res = await api.get(url.getAllClass, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      setClassList(res.data.data || []);
-    } catch (err) {
-      console.log(err);
-      if (err.response.status == 401) {
-        logout();
-        localStorage.setItem("isLog", false);
-        navigate("/");
-        toast.error(err.response?.data?.responseDescription || "Please login again");
-      } else {
-        toast.error(
-          err.response?.data?.responseDescription || "Failed to load class"
-        );
-      }
-    }
+
+  const fetchGroupedSubjects = async () => {
+    try {
+      const res = await api.get(url.getAllSubject, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setGroupedSubjects(res.data.data || []);
+    } catch (err) { handleErr(err, "Failed to load subjects"); }
   };
 
   useEffect(() => {
-    // fetchExams();
-    const loadExams = async () => {
+    const loadData = async () => {
       await fetchExams();
-      await fetchClasses();
-
-    };
-
-    loadExams();
+      await fetchGroupedSubjects();
+    }
+    loadData();
   }, []);
 
+  // ── When subject changes → load its classSubjects ───────────
+  const handleSubjectChange = async (subjectId) => {
+    setForm((prev) => ({ ...prev, subjectId, classSubjectId: "" }));
+    setClassSubjectsForSelected([]);
+    try {
+      const res = await api.get(`${url.getClassSubjectBySubject}/${subjectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setClassSubjectsForSelected(res.data.data || []);
+    } catch (err) { handleErr(err, "Failed to load classes"); }
+  };
+
+  // ── Dialog open/close ───────────────────────────────────────
+  const handleOpen = () => setOpen(true);
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditMode(false);
+    setEditingId(null);
+    setClassSubjectsForSelected([]);
+    setForm({ examName: "", subjectId: "", classSubjectId: "", fullMark: "" });
+  };
+
+  // ── Submit ──────────────────────────────────────────────────
   const handleSubmit = async () => {
+    if (!form.examName) { toast.error("Enter exam name"); return; }
+    if (!form.classSubjectId) { toast.error("Select subject & class"); return; }
+    if (!form.fullMark) { toast.error("Enter full mark"); return; }
     try {
       const payload = {
         examName: form.examName,
-        studentClass: form.studentClass || null,
-        fullMark: Number(form.fullMark)
+        classSubjectId: form.classSubjectId,
+        fullMark: Number(form.fullMark),
       };
-
-      const res = await api.post(url.addExam, payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+      await api.post(url.addExam, payload, {
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
-
-      setForm({
-        examName: "",
-        studentClass: "",
-        fullMark: ""
-      });
-
+      toast.success("Exam added successfully!");
       await fetchExams();
-
       handleClose();
-      toast.success("Exam added successfully");
-
-    } catch (err) {
-      if (err.response.status == 401) {
-        logout();
-        localStorage.setItem("isLog", false);
-        navigate("/");
-        toast.error(err.response?.data?.responseDescription || "Please login again");
-      } else {
-        toast.error(
-          err.response?.data?.responseDescription || "Failed to submit exams"
-        );
-      }
-    }
+    } catch (err) { handleErr(err, "Failed to add exam"); }
   };
 
-  const handleEdit = (exam) => {
+  // ── Edit open ───────────────────────────────────────────────
+  const handleEdit = async (exam) => {
     setEditMode(true);
     setEditingId(exam.id);
-
     setForm({
-      examName: exam.name || "",
-      studentClass: exam.studentClass || "",
-      fullMark: exam.fullMark || ""
+      examName: exam.examName,
+      subjectId: "",
+      classSubjectId: exam.classSubjectId || "",
+      fullMark: exam.fullMark,
     });
 
-    handleOpen();
+    // find subjectId from examList data
+    const subjectId = groupedSubjects.find(
+      (s) => s.name === exam.subjectName
+    )?.id;
+
+    if (subjectId) {
+      await handleSubjectChange(subjectId);
+      setForm((prev) => ({ ...prev, subjectId, classSubjectId: exam.classSubjectId }));
+    }
+    setOpen(true);
   };
 
+  // ── Update ──────────────────────────────────────────────────
   const handleUpdate = async () => {
     try {
-
       const payload = {
         id: editingId,
         examName: form.examName,
-        studentClass: form.studentClass || null,
-        fullMark: Number(form.fullMark)
+        classSubjectId: form.classSubjectId || null,
+        fullMark: Number(form.fullMark),
       };
-
-      await api.put(
-        url.editExam,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
-      await fetchExams();
-
-      toast.success("Exam updated successfully");
-
-      setEditMode(false);
-      setEditingId(null);
-
-      setForm({
-        examName: "",
-        studentClass: "",
-        fullMark: ""
+      await api.put(url.editExam, payload, {
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
-
+      toast.success("Exam updated successfully!");
+      await fetchExams();
       handleClose();
-
-    } catch (err) {
-      if (err.response.status == 401) {
-        logout();
-        localStorage.setItem("isLog", false);
-        navigate("/");
-        toast.error(err.response?.data?.responseDescription || "Please login again");
-      } else {
-        toast.error(
-          err.response?.data?.responseDescription || "Failed to update exam"
-        );
-      }
-    }
+    } catch (err) { handleErr(err, "Failed to update exam"); }
   };
 
-  const handleDelete = async (exam) => {
-    if (!selectedExam?.id) {
-      toast.error("Invalid exam selected");
-      return;
-    }
-    try {
-      await api.delete(
-        `${url.deleteExam}/${selectedExam.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+  // ── Delete ──────────────────────────────────────────────────
+  const handleDeleteClick = (exam) => { setSelectedExam(exam); setDeleteOpen(true); };
 
+  const handleDelete = async () => {
+    try {
+      await api.delete(`${url.deleteExam}/${selectedExam.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Exam deleted successfully!");
       await fetchExams();
       setDeleteOpen(false);
-      toast.success("Exam deleted successfully");
-
-    } catch (err) {
-      if (err.response.status == 401) {
-        logout();
-        localStorage.setItem("isLog", false);
-        navigate("/");
-        toast.error(err.response?.data?.responseDescription || "Please login again");
-      } else {
-        toast.error(
-          err.response?.data?.responseDescription || "Failed to delete exams"
-        );
-      }
-    }
-  };
-
-  const handleDeleteClick = (exam) => {
-    setSelectedExam(exam);
-    setDeleteOpen(true);
+      setSelectedExam(null);
+    } catch (err) { handleErr(err, "Failed to delete exam"); }
   };
 
   return (
     <Box sx={{ mt: 10, position: "relative" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mx: 4,
-          mt: 2,
-          mb: 1,
-        }}
-      >
-        <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>
-          Exams
-        </Typography>
 
-        <IconButton
-          onClick={handleOpen}
-          sx={{
-            bgcolor: "#1976d2",
-            color: "white",
-            boxShadow: 3,
-            "&:hover": { bgcolor: "#1565c0" },
-          }}
-        >
+      {/* Header */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mx: 4, mt: 2, mb: 1 }}>
+        <Typography variant="h6" sx={{ color: "white", fontWeight: "bold" }}>Exams</Typography>
+        <IconButton onClick={handleOpen} sx={{ bgcolor: "#1976d2", color: "white", "&:hover": { bgcolor: "#1565c0" } }}>
           <AddIcon />
         </IconButton>
       </Box>
 
-      <Box
-        sx={{ px: 5 }}>
-        <TableContainer
-          component={Paper}
-          sx={{ mt: 2, bgcolor: "#404147", borderRadius: 2 }}
-        >
+      {/* Table */}
+      <Box sx={{ px: 5 }}>
+        <TableContainer component={Paper} sx={{ mt: 2, bgcolor: "#404147", borderRadius: 2 }}>
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: "#494e6b" }}>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>Exam Name</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Full Mark</TableCell>
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Subject</TableCell>
                 <TableCell sx={{ color: "white", fontWeight: "bold" }}>Class</TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold", pr: 5 }}
-                >
-                  Actions
-                </TableCell>
-
-
+                <TableCell sx={{ color: "white", fontWeight: "bold" }}>Full Mark</TableCell>
+                <TableCell align="right" sx={{ color: "white", fontWeight: "bold", pr: 5 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
-              {examList.map((exam, index) => (
-                <TableRow
-                  key={index}
-                  sx={{
-                    "&:hover": { bgcolor: "#4a4c54" },
-                    borderBottom: "1px solid #555"
-                  }}
-                >
-                  <TableCell sx={{ color: "white" }}>{exam.name}</TableCell>
+              {examList.map((exam) => (
+                <TableRow key={exam.id} sx={{ "&:hover": { bgcolor: "#4a4c54" }, borderBottom: "1px solid #555" }}>
+                  <TableCell sx={{ color: "white" }}>{exam.examName}</TableCell>
+                  <TableCell sx={{ color: "white" }}>{exam.subjectName}</TableCell>
+                  <TableCell sx={{ color: "white" }}>{exam.className}</TableCell>
                   <TableCell sx={{ color: "white" }}>{exam.fullMark}</TableCell>
-                  <TableCell sx={{ color: "white" }}>{exam.studentClass !== null ? exam.studentClass : "-"}</TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: "gray", pr: 4 }}
-                  >
-                    <IconButton>
-                      <CreateIcon
-                        sx={{ color: "#989994" }}
-                        onClick={() => handleEdit(exam)}
-                      />
+                  <TableCell align="right" sx={{ pr: 4 }}>
+                    <IconButton onClick={() => handleEdit(exam)}>
+                      <CreateIcon sx={{ color: "#989994" }} />
                     </IconButton>
-
                     <IconButton onClick={() => handleDeleteClick(exam)}>
                       <DeleteIcon sx={{ color: "#d32f2f" }} />
                     </IconButton>
                   </TableCell>
-
                 </TableRow>
               ))}
-
               {examList.length === 0 && (
                 <TableRow>
-                  <TableCell
-                    colSpan={2}
-                    sx={{ color: "#a39d9d", textAlign: "center", py: 4 }}
-                  >
+                  <TableCell colSpan={5} sx={{ color: "#a39d9d", textAlign: "center", py: 4 }}>
                     No exams found
                   </TableCell>
                 </TableRow>
@@ -380,113 +254,79 @@ const Exams = () => {
         </TableContainer>
       </Box>
 
-      {/* 🧾 Dialog Form */}
+      {/* ── Dialog: Add/Edit Exam ── */}
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        {/* <DialogTitle>Add Exam</DialogTitle> */}
-        <DialogTitle>
-          {editMode ? "Edit Exam" : "Add Exam"}
-        </DialogTitle>
-
+        <DialogTitle>{editMode ? "Edit Exam" : "Add Exam"}</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1, pt: "20px !important" }}>
+
           <TextField
             label="Exam Name"
-            name="examName"
             value={form.examName}
-            onChange={handleChange}
+            onChange={(e) => setForm({ ...form, examName: e.target.value })}
             fullWidth
-            required
           />
 
-          {/* <TextField
-            label="Class (optional)"
-            name="studentClass"
-            value={form.studentClass}
-            onChange={handleChange}
-            fullWidth
-          /> */}
-          <TextField
-            select
-            label="Class"
-            name="studentClass"
-            value={form.studentClass}
-            onChange={handleChange}
-            fullWidth
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
+          {/* Subject Select */}
+          <FormControl fullWidth>
+            <InputLabel>Subject</InputLabel>
+            <Select
+              label="Subject"
+              value={form.subjectId}
+              onChange={(e) => handleSubjectChange(e.target.value)}
+            >
+              {groupedSubjects.map((s) => (
+                <MenuItem key={s.id} value={s.id}>
+                  {s.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-            {classList.map((cls) => (
-              <MenuItem
-                key={cls.id}
-                value={cls.studentClass}
-              >
-                {cls.studentClass}
-              </MenuItem>
-            ))}
-          </TextField>
+          {/* Class Select — depends on subject */}
+          <FormControl fullWidth disabled={!form.subjectId}>
+            <InputLabel>Class</InputLabel>
+            <Select
+              label="Class"
+              value={form.classSubjectId}
+              onChange={(e) => setForm({ ...form, classSubjectId: e.target.value })}
+            >
+              {classSubjectsForSelected.map((cs) => (
+                <MenuItem key={cs.id} value={cs.id}>
+                  {cs.studentClass?.studentClass}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             label="Full Mark"
-            name="fullMark"
             type="number"
             value={form.fullMark}
-            onChange={handleChange}
+            onChange={(e) => setForm({ ...form, fullMark: e.target.value })}
             fullWidth
-            required
           />
         </DialogContent>
-
         <DialogActions>
           <Button onClick={handleClose} color="error">Cancel</Button>
-          {/* <Button onClick={handleSubmit} variant="contained">Add</Button> */}
-          <Button
-            onClick={editMode ? handleUpdate : handleSubmit}
-            variant="contained"
-          >
+          <Button variant="contained" onClick={editMode ? handleUpdate : handleSubmit}>
             {editMode ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* delete confirm */}
-      <Dialog
-        open={deleteOpen}
-        onClose={() => {
-          setDeleteOpen(false);
-          setSelectedExam(null);
-        }}
-      >
-        <DialogTitle>
-          Delete Exam
-        </DialogTitle>
-
+      {/* ── Dialog: Delete Confirm ── */}
+      <Dialog open={deleteOpen} onClose={() => { setDeleteOpen(false); setSelectedExam(null); }}>
+        <DialogTitle>Delete Exam</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete{" "}
-            <strong>{selectedExam?.name}</strong>?
+            Are you sure you want to delete <strong>{selectedExam?.examName}</strong>?
           </Typography>
         </DialogContent>
-
         <DialogActions>
-          <Button
-            onClick={() => {
-              setDeleteOpen(false);
-              setSelectedExam(null);
-            }}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            color="error"
-            variant="contained"
-            onClick={handleDelete}
-          >
-            Delete
-          </Button>
+          <Button onClick={() => { setDeleteOpen(false); setSelectedExam(null); }}>Cancel</Button>
+          <Button color="error" variant="contained" onClick={handleDelete}>Delete</Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 };

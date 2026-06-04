@@ -74,7 +74,7 @@ const Students = () => {
             student?.presentAddress?.state,
         ].filter(Boolean)
             .join(",");
-        console.log(fullAddress)
+        // console.log(fullAddress)
         return fullAddress.length > 50
             ? `${fullAddress.substring(0, 50)}...`
             : (fullAddress || "_");
@@ -108,6 +108,7 @@ const Students = () => {
     }
 
     const handleEditOpen = (student) => {
+        console.log(student)
         setEditForm({
             id: student.id,
             name: student.name || "",
@@ -116,9 +117,9 @@ const Students = () => {
             dob: student.dob ? dayjs(student.dob) : null,
             fatherName: student.fatherName || "",
             motherName: student.motherName || "",
-            section: student.section || "",
+            sectionId: student.section?.id || "",
             studiedFrom: student.studiedFrom ? dayjs(student.studiedFrom) : null,
-            phoneNo:student.phoneNo || "",
+            phoneNo: student.phoneNo || "",
             presentAddress: {
                 street: student.presentAddress?.street || "",
                 city: student.presentAddress?.city || "",
@@ -216,128 +217,142 @@ const Students = () => {
                         }}
                     >
                         <List >
-                            {students.map((student, index) => (
-                                <Box key={student.id}>
-                                    <ListItem
-                                        sx={{
-                                            color: "white",
-                                            mb: 2,
-                                            borderRadius: 2,
-                                            bgcolor: "#404147",
-                                            cursor: "pointer",
-                                        }}
-                                        onClick={() => setOpen(open === index ? null : index)}
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar
-                                                src={`${student.image}?w=80&h=80&fit=crop`}
-                                                alt={student.name}
-                                                slotProps={{
-                                                    img: {
-                                                        loading: 'lazy',
-                                                        referrerPolicy: 'no-referrer'
-                                                    }
-                                                }}
-                                            />
-                                        </ListItemAvatar>
-
-                                        <ListItemText
-                                            primary={
-                                                <Typography sx={{ color: "white", fontWeight: "bold" }}>
-                                                    {student.name}
-                                                </Typography>
-                                            }
-                                            secondary={
-                                                <Typography sx={{ color: "gray" }} variant="body2">
-                                                    Class {student.section || '_'}
-                                                </Typography>
-                                            }
-                                        />
-                                        <IconButton onClick={(e) => { e.stopPropagation(); handleEditOpen(student); }}>
-                                            <CreateIcon sx={{ color: "#989994" }} />
-                                        </IconButton>
-                                        {open === index ? (
-                                            <ExpandMore
-                                                sx={{ color: "white" }}
-                                                onClick={() => setOpen(null)}
-                                            />
-                                        ) : (
-                                            <ExpandLess
-                                                sx={{ color: "white" }}
-                                                onClick={() => setOpen(index)}
-                                            />
-                                        )}
-                                    </ListItem>
-
-                                    <Collapse in={open === index}
-                                        timeout={150}
-                                        unmountOnExit>
-                                        <List
-                                            component="div"
-                                            disablePadding
+                            {students && students.length > 0 ? (
+                                students.map((student, index) => (
+                                    <Box key={student.id}>
+                                        <ListItem
                                             sx={{
-                                                bgcolor: "#404147",
-                                                borderRadius: 2,
-                                                ml: 1.5,
+                                                color: "white",
                                                 mb: 2,
+                                                borderRadius: 2,
+                                                bgcolor: "#404147",
+                                                cursor: "pointer",
                                             }}
+                                            onClick={() => setOpen(open === index ? null : index)}
                                         >
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">🧑‍🦰 Gender</Typography>}
-                                                    secondary={<Typography color="gray">{student.gender || "_"}</Typography>}
+                                            <ListItemAvatar>
+                                                <Avatar
+                                                    src={`${student.image}?w=80&h=80&fit=crop`}
+                                                    alt={student.name}
+                                                    slotProps={{
+                                                        img: {
+                                                            loading: 'lazy',
+                                                            referrerPolicy: 'no-referrer'
+                                                        }
+                                                    }}
                                                 />
-                                            </ListItem>
-                                            <Divider sx={{ bgcolor: "#55575e" }} />
+                                            </ListItemAvatar>
 
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">📧 Email</Typography>}
-                                                    secondary={<Typography color="gray">{student.email || "_"}</Typography>}
+                                            <ListItemText
+                                                primary={
+                                                    <Typography sx={{ color: "white", fontWeight: "bold" }}>
+                                                        {student.name}
+                                                    </Typography>
+                                                }
+                                                secondary={
+                                                    <Typography sx={{ color: "gray" }} variant="body2">
+                                                        Class {student.section?.studentClass || '_'}
+                                                    </Typography>
+                                                }
+                                            />
+                                            <IconButton onClick={(e) => { e.stopPropagation(); handleEditOpen(student); }}>
+                                                <CreateIcon sx={{ color: "#989994" }} />
+                                            </IconButton>
+                                            {open === index ? (
+                                                <ExpandMore
+                                                    sx={{ color: "white" }}
+                                                    onClick={() => setOpen(null)}
                                                 />
-                                            </ListItem>
-                                            <Divider sx={{ bgcolor: "#55575e" }} />
+                                            ) : (
+                                                <ExpandLess
+                                                    sx={{ color: "white" }}
+                                                    onClick={() => setOpen(index)}
+                                                />
+                                            )}
+                                        </ListItem>
 
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">🎂 Age</Typography>}
-                                                    secondary={<Typography color="gray">{student.age || "_"}</Typography>}
-                                                />
-                                            </ListItem>
-                                            <Divider sx={{ bgcolor: "#55575e" }} />
+                                        <Collapse in={open === index}
+                                            timeout={150}
+                                            unmountOnExit>
+                                            <List
+                                                component="div"
+                                                disablePadding
+                                                sx={{
+                                                    bgcolor: "#404147",
+                                                    borderRadius: 2,
+                                                    ml: 1.5,
+                                                    mb: 2,
+                                                }}
+                                            >
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">🧑‍🦰 Gender</Typography>}
+                                                        secondary={<Typography color="gray">{student.gender || "_"}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                <Divider sx={{ bgcolor: "#55575e" }} />
 
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">📘 Studied From</Typography>}
-                                                    secondary={<Typography color="gray">{student.studiedFrom || "_"}</Typography>}
-                                                />
-                                            </ListItem>
-                                            <Divider sx={{ bgcolor: "#55575e" }} />
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">📧 Email</Typography>}
+                                                        secondary={<Typography color="gray">{student.email || "_"}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                <Divider sx={{ bgcolor: "#55575e" }} />
 
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">🏫 Address</Typography>}
-                                                    secondary={
-                                                        <Typography color="gray">
-                                                            {
-                                                                studentAddress(student)
-                                                            }
-                                                        </Typography>
-                                                    }
-                                                />
-                                            </ListItem>
-                                            <Divider sx={{ bgcolor: "#55575e" }} />
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">🎂 Age</Typography>}
+                                                        secondary={<Typography color="gray">{student.age || "_"}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                <Divider sx={{ bgcolor: "#55575e" }} />
 
-                                            <ListItem sx={{ pl: 4 }}>
-                                                <ListItemText
-                                                    primary={<Typography color="white">📞 Parent Contact</Typography>}
-                                                    secondary={<Typography color="gray">{student.phoneNo || "_"}</Typography>}
-                                                />
-                                            </ListItem>
-                                        </List>
-                                    </Collapse>
-                                </Box>
-                            ))}
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">📘 Studied From</Typography>}
+                                                        secondary={<Typography color="gray">{student.studiedFrom || "_"}</Typography>}
+                                                    />
+                                                </ListItem>
+                                                <Divider sx={{ bgcolor: "#55575e" }} />
+
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">🏫 Address</Typography>}
+                                                        secondary={
+                                                            <Typography color="gray">
+                                                                {
+                                                                    studentAddress(student)
+                                                                }
+                                                            </Typography>
+                                                        }
+                                                    />
+                                                </ListItem>
+                                                <Divider sx={{ bgcolor: "#55575e" }} />
+
+                                                <ListItem sx={{ pl: 4 }}>
+                                                    <ListItemText
+                                                        primary={<Typography color="white">📞 Parent Contact</Typography>}
+                                                        secondary={<Typography color="gray">{student.phoneNo || "_"}</Typography>}
+                                                    />
+                                                </ListItem>
+                                            </List>
+                                        </Collapse>
+                                    </Box>
+                                ))
+                            ) : (
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        color: "#989994",
+                                        textAlign: "center",
+                                        mt: 4,
+                                        fontStyle: "italic"
+                                    }}
+                                >
+                                    No Students found !
+                                </Typography>
+                            )}
 
                         </List>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -352,15 +367,15 @@ const Students = () => {
                                     {editForm && (
                                         <Grid container spacing={2}>
                                             {/* Basic Info */}
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid item size={{ xs: 12, sm: 6 }}>
                                                 <TextField fullWidth label="Name" value={editForm.name}
                                                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid item size={{ xs: 12, sm: 6 }}>
                                                 <TextField fullWidth label="Email" value={editForm.email}
                                                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid item size={{ xs: 12, sm: 6 }}>
                                                 <FormControl fullWidth>
                                                     <InputLabel>Gender</InputLabel>
                                                     <Select label="Gender" value={editForm.gender}
@@ -373,48 +388,47 @@ const Students = () => {
                                                     </Select>
                                                 </FormControl>
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid item size={{ xs: 12, sm: 6 }}>
                                                 <DatePicker label="Date of Birth" value={editForm.dob}
                                                     onChange={(val) => setEditForm({ ...editForm, dob: val })}
                                                     slotProps={{ textField: { fullWidth: true } }} />
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField fullWidth label="Father Name" value={editForm.fatherName}
                                                     onChange={(e) => setEditForm({ ...editForm, fatherName: e.target.value })} />
                                             </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <TextField type='number' fullWidth label="Mother Name" value={editForm.motherName}
+                                            <Grid size={{ xs: 12, sm: 6 }}>
+                                                <TextField fullWidth label="Mother Name" value={editForm.motherName}
                                                     onChange={(e) => setEditForm({ ...editForm, motherName: e.target.value })} />
                                             </Grid>
-                                             <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField fullWidth label="Parent Contact" value={editForm.phoneNo}
                                                     onChange={(e) => setEditForm({ ...editForm, phoneNo: e.target.value })} />
                                             </Grid>
                                             {/* Section + Studied From - apni row mein */}
                                             <FormControl fullWidth>
                                                 <InputLabel>Section</InputLabel>
-
                                                 <Select
-                                                    value={editForm.section || ""}
+                                                    value={editForm.sectionId || ""}
                                                     label="Section"
                                                     onChange={(e) =>
                                                         setEditForm({
                                                             ...editForm,
-                                                            section: e.target.value
+                                                            sectionId: e.target.value
                                                         })
                                                     }
                                                 >
                                                     {classes.map((cls) => (
                                                         <MenuItem
                                                             key={cls.id}
-                                                            value={cls.studentClass}
+                                                            value={cls.id}
                                                         >
                                                             {cls.studentClass}
                                                         </MenuItem>
                                                     ))}
                                                 </Select>
                                             </FormControl>
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <DatePicker label="Studied From" value={editForm.studiedFrom}
                                                     onChange={(val) => setEditForm({ ...editForm, studiedFrom: val })}
                                                     slotProps={{ textField: { fullWidth: true } }} />
@@ -434,7 +448,7 @@ const Students = () => {
                                                 </Typography>
                                             </Box>
 
-                                            <Grid item xs={12}>
+                                            <Grid size={12}>
                                                 <TextField
                                                     fullWidth
                                                     label="Street"
@@ -451,7 +465,7 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="City"
@@ -468,7 +482,7 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="State"
@@ -485,9 +499,9 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            
 
-                                            <Grid item xs={12} sm={6}>
+
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="Pincode"
@@ -503,14 +517,14 @@ const Students = () => {
                                                     }
                                                 />
                                             </Grid>
-                                           
+
                                             {/* Permanent Address */}
                                             <Box sx={{ width: "100%", mt: 2, mb: 1 }}>
                                                 <Divider sx={{ mb: 1 }} />
                                                 <Box sx={{
-                                                    display:'flex',
-                                                    alignItems:'center',
-                                                    justifyContent:'space-between'
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between'
                                                 }}>
                                                     <Typography
                                                         variant="h6"
@@ -554,7 +568,7 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="City"
@@ -572,7 +586,7 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            <Grid item xs={12} sm={6}>
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="State"
@@ -590,9 +604,9 @@ const Students = () => {
                                                 />
                                             </Grid>
 
-                                            
 
-                                            <Grid item xs={12} sm={6}>
+
+                                            <Grid size={{ xs: 12, sm: 6 }}>
                                                 <TextField
                                                     fullWidth
                                                     label="Pincode"

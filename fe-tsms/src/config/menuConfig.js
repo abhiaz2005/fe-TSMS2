@@ -23,6 +23,7 @@ export const menuConfig = {
     {
       label: "Student",
       children: [
+        { label: "Subject Management", path: "/subject" },
         { label: "Students", path: "/students" },
         { label: "Exams", path: "/exams" },
         { label: "Reports", path: "/report" },
