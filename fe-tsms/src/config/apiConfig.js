@@ -1,11 +1,14 @@
 export const url = {
     registerUser: "/auth/register",
     login: "auth/login",
-    //student
+    //user
     getStudentById: "api/get/student",
     getAllStudent: "api/get/all/student",
     updateStudent: "/api/update/user",
+    //fees
     getAllFees: "api/fees/all",
+    getStudent: "/api/get/student",
+    getStudentFeeById:"api/fees",
     //otp
     verifyOtp: "verify/otp",
     //exam
@@ -27,7 +30,14 @@ export const url = {
     addClassSubject: "/api/class-subject/add",
     editClassSubject: "/api/class-subject/edit",
     deleteClassSubject: "/api/class-subject/delete",
-    getGroupedSubjects:"api/class-subject/group/by/subject",
+    getGroupedSubjects: "api/class-subject/group/by/subject",
     deleteAllClassSubjectBySubject: "/api/class-subject/delete/all/by/subjectId",
     getClassSubjectBySubject: "/api/class-subject/by-subject",
+    //marks
+    getAllMarks: "/api/marks/all",
+    addMarks: "/api/marks/add",
+    editMark: "/api/marks/edit",
+    deleteMark: "/api/marks/delete",
+    generateReport: "/api/generate/report",
+    getStudentReport: "/api/marks/student", 
 }

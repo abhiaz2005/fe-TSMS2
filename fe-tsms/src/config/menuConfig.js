@@ -10,9 +10,9 @@ export const menuConfig = {
     {
       label: "Student",
       children: [
-        { label: "Profile", path: `/student/${userId}` },
+        { label: "Profile", path: `/students/${userId}` },
         { label: "Fees", path: `/student/fees/${userId}` },
-        { label: "Report", path: `/student/report/${userId}` },
+        { label: "Report", path: `/students/report/${userId}` },
       ],
     },
   ],

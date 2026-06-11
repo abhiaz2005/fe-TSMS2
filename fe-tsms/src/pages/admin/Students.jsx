@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import Layout from '../components/layout/Layout'
+import Layout from '../../components/layout/Layout'
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Collapse, Divider } from '@mui/material'
-import { StudentList } from '../data/student'
+import { StudentList } from '../../data/student'
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate, useParams } from 'react-router-dom';
-import StudentProfile from '../components/commons/StudentProfile';
-import { api } from '../api/axios';
-import { useAuth } from "../contexts/authcontext/AuthContext";
+import StudentProfile from '../users/StudentProfile';
+import { api } from '../../api/axios';
+import { useAuth } from "../../contexts/authcontext/AuthContext";
 import { toast } from "react-toastify";
-import { url } from "../config/apiConfig"
+import { url } from "../../config/apiConfig"
 import {
     // existing...
     Dialog, DialogTitle, DialogContent, DialogActions,
@@ -31,6 +31,7 @@ import {
 const Students = () => {
     const [open, setOpen] = useState(false);
     const [students, setStudents] = useState([]);
+    const [studentProfile, setStudentProfile] = useState({});
     const [loading, setLoading] = useState(true);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editForm, setEditForm] = useState(null);
@@ -62,9 +63,9 @@ const Students = () => {
         }
     };
 
-    const studentData = id
-        ? StudentList.find((s) => s.id === studentIdNumber)
-        : null;
+    // const studentData = id
+    //     ? StudentList.find((s) => s.id === studentIdNumber)
+    //     : null;
 
     const studentAddress = (student) => {
         const fullAddress = [
@@ -107,6 +108,26 @@ const Students = () => {
         }
     }
 
+    const fetchStudentById = async (studentId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await api.get(`${url.getStudent}?id=${studentId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.data.responseCode === 200) {
+                setStudentProfile(res.data.data);
+            }
+        } catch (err) {
+            if (err.response?.status === 401) {
+                logout(); localStorage.setItem("isLog", false); navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            } else {
+                toast.error(err.response?.data?.responseDescription || "Failed to load student");
+            }
+        }finally{
+            setLoading(false);
+        }
+    };
     const handleEditOpen = (student) => {
         console.log(student)
         setEditForm({
@@ -183,11 +204,17 @@ const Students = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            await fetchStudents();
-            await fetchClasses();
-        }
+            if (id) {
+                // Profile page — sirf ek student fetch karo
+                await fetchStudentById(studentIdNumber);
+            } else {
+                // List page — sab fetch karo
+                await fetchStudents();
+                await fetchClasses();
+            }
+        };
         loadData();
-    }, []);
+    }, [id]);
 
     if (loading) return <Box sx={{ mt: 15 }}>
         <Typography variant='h3' color='primary'>
@@ -198,10 +225,11 @@ const Students = () => {
 
 
 
-
+    console.log("id from params : ",id)
     return (
         <Box>
             {
+                
                 !id ? (
                     <Box
                         sx={{
@@ -640,12 +668,10 @@ const Students = () => {
                 ) : (
 
                     <Box sx={{ my: 10, p: 2, color: "white" }}>
-                        {studentData ? (
-                            <StudentProfile student={studentData} />
+                        {studentProfile?.id ? (
+                            <StudentProfile student={studentProfile} />
                         ) : (
-                            <Typography sx={{ color: "white", p: 2 }}>
-                                Student not found 😕
-                            </Typography>
+                            <Typography sx={{ color: "white", p: 2 }}>Student not found 😕</Typography>
                         )}
                     </Box>
                 )

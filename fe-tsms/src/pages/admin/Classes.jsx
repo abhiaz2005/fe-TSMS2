@@ -20,11 +20,11 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
-import { api } from "../api/axios";
+import { api } from "../../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { url } from "../config/apiConfig";
-import { useAuth } from "../contexts/authcontext/AuthContext";
+import { url } from "../../config/apiConfig";
+import { useAuth } from "../../contexts/authcontext/AuthContext";
 
 
 const Classes = () => {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { studentFees } from "../data/student";
-import "../styles/FeesStyles.css";
+import { studentFees } from "../../data/student";
+import "../../styles/FeesStyles.css";
 import { useNavigate, useParams } from 'react-router-dom'
-import StudentFeeDetail from '../components/commons/StudentFeeDetail'
+import StudentFeeDetail from '../users/StudentFeeDetail'
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -42,11 +42,11 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { url } from "../config/apiConfig";
-import { months } from "../data/month";
+import { url } from "../../config/apiConfig";
+import { months } from "../../data/month";
 import { toast } from "react-toastify";
-import { api } from "../api/axios";
-import { useAuth } from "../contexts/authcontext/AuthContext";
+import { api } from "../../api/axios";
+import { useAuth } from "../../contexts/authcontext/AuthContext";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - 2 + i); // e.g. 2024–2028
@@ -59,6 +59,7 @@ const StudentFees = () => {
     : null;
 
   const [students, setStudents] = useState([]);
+  const [studentSpefic, setStudentSpecific] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [expandOpen, setExpandOpen] = useState(null);
@@ -94,6 +95,25 @@ const StudentFees = () => {
         toast.error(err.response?.data?.responseDescription || "Please login again");
       } else {
         toast.error(err.response?.data?.responseDescription || "Something went wrong");
+      }
+    }
+  };
+
+  const fetchStudentFeeById = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get(`${url.getStudentFeeById}?id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.data.responseCode === 200) {
+        setStudentSpecific(res.data.data || []);  // ← array set karo
+      }
+    } catch (err) {
+      if (err.response?.status === 401) {
+        logout(); localStorage.setItem("isLog", false); navigate("/");
+        toast.error(err.response?.data?.responseDescription || "Please login again");
+      } else {
+        toast.error(err.response?.data?.responseDescription || "Failed to load student");
       }
     }
   };
@@ -204,11 +224,15 @@ const StudentFees = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      await fetchFees(CURRENT_YEAR);
-      await fetchStudents();
+      if (id) {
+        await fetchStudentFeeById(id);
+      } else {
+        await fetchFees(CURRENT_YEAR);
+        await fetchStudents();
+      }
     };
     loadData();
-  }, []);
+  }, [id]);
 
 
   return (
@@ -424,10 +448,10 @@ const StudentFees = () => {
         </>
       ) : (
         <Box sx={{ my: 10, p: 2, color: "white" }}>
-          {studentData ? (
-            <StudentFeeDetail student={studentData} />
+          {studentSpefic.length > 0 ? (
+            <StudentFeeDetail feesData={studentSpefic} />  
           ) : (
-            <Typography sx={{ color: "white", p: 2 }}>Student not found 😕</Typography>
+            <Typography sx={{ color: "white", p: 2 }}>No fee records found 😕</Typography>
           )}
         </Box>
       )}

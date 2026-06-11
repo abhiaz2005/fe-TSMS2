@@ -23,11 +23,11 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ClassIcon from "@mui/icons-material/Class";
 import React, { useEffect, useState } from "react";
-import { api } from "../api/axios";
+import { api } from "../../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { url } from "../config/apiConfig";
-import { useAuth } from "../contexts/authcontext/AuthContext";
+import { url } from "../../config/apiConfig";
+import { useAuth } from "../../contexts/authcontext/AuthContext";
 
 const Subjects = () => {
     const token = localStorage.getItem("token");

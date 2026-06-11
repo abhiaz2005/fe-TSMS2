@@ -5,17 +5,18 @@ import {
 } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import Home from "../pages/Home";
-import Students from "../pages/Students";
+import Students from "../pages/admin/Students";
 import About from "../pages/About";
-import StudentFees from "../pages/StudentFees";
+import StudentFees from "../pages/admin/StudentFees";
 import PageNotFound from "../pages/PageNotFound";
-import Report from "../pages/Report";
+import Report from "../pages/admin/Report";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../pages/Login";
 import RegisterForm from "../pages/RegisterForm";
-import Exams from "../pages/Exams";
-import Classes from "../pages/Classes";
-import Subjects from "../pages/Subjects";
+import Exams from "../pages/admin/Exams";
+import Classes from "../pages/admin/Classes";
+import Subjects from "../pages/admin/Subjects";
+import StudentReportView from "../pages/users/StudentReportView";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -40,8 +41,9 @@ export const router = createBrowserRouter(
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["ADMIN", "USER"]} />}>
-          <Route path="student/fees/:id" element={<StudentFees />} />
+          <Route path="students/fees/:id" element={<StudentFees />} />
           <Route path="students/:id" element={<Students />} />
+          <Route path="students/report/:id" element={<StudentReportView />} />
         </Route>
         {/* 404 */}
         <Route path="*" element={<PageNotFound />} />
