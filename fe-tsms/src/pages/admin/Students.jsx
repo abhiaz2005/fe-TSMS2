@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/layout/Layout'
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Collapse, Divider } from '@mui/material'
 import { StudentList } from '../../data/student'
@@ -25,6 +25,8 @@ import {
     Checkbox,
     FormControlLabel
 } from "@mui/material";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+
 
 
 
@@ -38,9 +40,14 @@ const Students = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [classes, setClasses] = useState([]);
     const [sameAddress, setSameAddress] = useState(false);
+    const [uploadingId, setUploadingId] = useState(null);
+
 
     const { logout } = useAuth();
     const navigate = useNavigate();
+
+    const fileInputRef = useRef(null);
+    const uploadTargetId = useRef(null);
 
 
 
@@ -48,6 +55,67 @@ const Students = () => {
     const { id } = useParams();
 
     const studentIdNumber = Number(id);
+
+    const handleAvatarClick = (studentId) => {
+        uploadTargetId.current = studentId;
+        fileInputRef.current?.click();
+    };
+
+    // ─── NEW: upload file, update student image in state ─────────────────────
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const studentId = uploadTargetId.current;
+        setUploadingId(studentId);
+
+        try {
+            const token = localStorage.getItem("token");
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await api.post(url.uploadFile, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (res.data.responseCode === 200) {
+                const newImageUrl = res.data.data;
+
+                
+                await api.post(url.updateImg,
+                    { id: studentId, image: newImageUrl },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                
+                setStudents((prev) =>
+                    prev.map((s) =>
+                        s.id === studentId ? { ...s, image: newImageUrl } : s
+                    )
+                );
+                toast.success("Profile photo updated!");
+            }
+        } catch (err) {
+            if (err.response?.status === 401) {
+                logout();
+                localStorage.setItem("isLog", false);
+                navigate("/");
+                toast.error(err.response?.data?.responseDescription || "Please login again");
+            } else {
+                toast.error(err.response?.data?.responseDescription || "Image upload failed");
+            }
+        } finally {
+            setUploadingId(null);
+            e.target.value = "";
+        }
+    };
 
     const handleSameAddress = (checked) => {
 
@@ -124,7 +192,7 @@ const Students = () => {
             } else {
                 toast.error(err.response?.data?.responseDescription || "Failed to load student");
             }
-        }finally{
+        } finally {
             setLoading(false);
         }
     };
@@ -225,11 +293,18 @@ const Students = () => {
 
 
 
-    console.log("id from params : ",id)
+    console.log("id from params : ", id)
     return (
         <Box>
+            <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+            />
             {
-                
+
                 !id ? (
                     <Box
                         sx={{
@@ -259,16 +334,56 @@ const Students = () => {
                                             onClick={() => setOpen(open === index ? null : index)}
                                         >
                                             <ListItemAvatar>
-                                                <Avatar
-                                                    src={`${student.image}?w=80&h=80&fit=crop`}
-                                                    alt={student.name}
-                                                    slotProps={{
-                                                        img: {
-                                                            loading: 'lazy',
-                                                            referrerPolicy: 'no-referrer'
-                                                        }
+                                                <Box
+                                                    sx={{ position: "relative", width: 40, height: 40, cursor: "pointer" }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleAvatarClick(student.id);
                                                     }}
-                                                />
+                                                >
+                                                    <Avatar
+                                                        src={`${student.image}?w=80&h=80&fit=crop`}
+                                                        alt={student.name}
+                                                        sx={{ width: 40, height: 40 }}
+                                                        slotProps={{
+                                                            img: { loading: 'lazy', referrerPolicy: 'no-referrer' }
+                                                        }}
+                                                    />
+                                                    {/* Camera overlay */}
+                                                    <Box
+                                                        sx={{
+                                                            position: "absolute",
+                                                            bottom: 0, left: 0,
+                                                            width: "100%", height: "50%",
+                                                            bgcolor: "rgba(0,0,0,0.55)",
+                                                            borderRadius: "0 0 50% 50%",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            opacity: uploadingId === student.id ? 1 : 0,
+                                                            transition: "opacity 0.2s",
+                                                            "&:hover": { opacity: 1 },
+                                                        }}
+                                                    >
+                                                        <CameraAltIcon sx={{ fontSize: 13, color: "white" }} />
+                                                    </Box>
+                                                    {/* Uploading spinner overlay */}
+                                                    {uploadingId === student.id && (
+                                                        <Box
+                                                            sx={{
+                                                                position: "absolute",
+                                                                inset: 0,
+                                                                bgcolor: "rgba(0,0,0,0.5)",
+                                                                borderRadius: "50%",
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                justifyContent: "center",
+                                                            }}
+                                                        >
+                                                            <Typography sx={{ color: "white", fontSize: 9 }}>...</Typography>
+                                                        </Box>
+                                                    )}
+                                                </Box>
                                             </ListItemAvatar>
 
                                             <ListItemText

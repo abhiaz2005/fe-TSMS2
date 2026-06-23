@@ -5,6 +5,7 @@ export const url = {
     getStudentById: "api/get/student",
     getAllStudent: "api/get/all/student",
     updateStudent: "/api/update/user",
+    updateImg:"api/update/img",
     //fees
     getAllFees: "api/fees/all",
     getStudent: "/api/get/student",
@@ -40,4 +41,7 @@ export const url = {
     deleteMark: "/api/marks/delete",
     generateReport: "/api/generate/report",
     getStudentReport: "/api/marks/student", 
+
+    //upload
+    uploadFile:"api/files/upload"
 }
